@@ -26,8 +26,8 @@ namespace VPNTorrent
 
         // these apps should never get killed
         ArrayList listWhilelist = new ArrayList(){ "explorer", "csrss", "dwm", "services" };
-        UTorrentClient client = new UTorrentClient(new System.Uri("http://localhost:23168/gui"), "halfmonty", "J*kupo89");
-        
+        UTorrentClient client;
+
         NotifyIcon m_nIcon = null;
         DispatcherTimer m_dispatcherTimer = null;
 
@@ -36,6 +36,8 @@ namespace VPNTorrent
 
         Boolean m_bIsInitCompleted = false;
         List<Torrent> torrentsHandled = new List<Torrent>();
+        List<string> applicationsClosed = new List<string>();
+        bool IsUtorrentConnected = false;
 
         public enum STATUS {
             VPN_CONNECTED,
@@ -53,6 +55,9 @@ namespace VPNTorrent
             m_configHandler.loadConfigValues();
             showConfigValues();
 
+
+
+
             setupTimer();
 
             setupNotifyIcon();
@@ -68,24 +73,25 @@ namespace VPNTorrent
         private void showConfigValues()
         {
             Helper.doLog(scrollViewerLog, "showConfigValues", m_configHandler.DebugMode, m_configHandler.ConsoleMaxSize);
-
             textBoxSelectedInterface.Text = m_configHandler.VPNInterfaceName;
-
             textBoxApps.Clear();
             foreach (String str in m_configHandler.getListApplications())
             {
                 textBoxApps.Text += str + Environment.NewLine;
             }
             textBoxApps.Text = textBoxApps.Text.Trim();
-
             checkBoxMinimized.IsChecked = m_configHandler.StartMinimized;
-
             checkBoxStrict.IsChecked = m_configHandler.StrictInterfaceHandling;
-
             comboBoxAction.SelectedIndex = m_configHandler.ActionIndex;
-
             checkBoxStartup.IsChecked = ShortcutHandler.isInStartup();
+            CheckBoxUtorrentEnabled.IsChecked = m_configHandler.uTorrentControlEnabled;
+            textBoxUtorrentUrl.Text = m_configHandler.uTorrentUrl;
+            textBoxUtorrentUsername.Text = m_configHandler.uTorrentUsername;
+            textBoxUtorrentPassword.Password = m_configHandler.uTorrentPassword;
+            RadioButtonPause.IsChecked = !m_configHandler.uTorrentStop;
+
         }
+
 
         // the minimize-to-tray feature
         private void setupNotifyIcon() {
@@ -115,6 +121,23 @@ namespace VPNTorrent
         
 //------ Functions -------//
 
+        // setup uTorrent Client and validate connection
+        private void setupUtorrentConnection()
+        {
+            client = new UTorrentClient(new System.Uri(m_configHandler.uTorrentUrl), m_configHandler.uTorrentUsername, m_configHandler.uTorrentPassword);
+            try
+            {
+                var test = client.Torrents.Count;
+                IsUtorrentConnected = true;
+                
+            }
+            catch (Exception e)
+            {
+                IsUtorrentConnected = false;
+            }
+            iconUtorrentEnabled(IsUtorrentConnected);
+        }
+
         // minimize the app to the trayicon
         private void doMinimize() {
             Helper.doLog(scrollViewerLog, "doMinimize", m_configHandler.DebugMode, m_configHandler.ConsoleMaxSize);
@@ -143,9 +166,19 @@ namespace VPNTorrent
             if (nSelection == 0) {
                 closeApp();
             } else if (nSelection == 1) {
-                pauseUtorrent();
-            } else if (nSelection == 2) {
-                stopUtorrent();
+                closeApp();
+            }
+
+            if (IsUtorrentConnected && m_configHandler.uTorrentControlEnabled)
+            {
+                if (m_configHandler.uTorrentStop)
+                {
+                    stopUtorrent();
+                }
+                else
+                {
+                    pauseUtorrent();
+                }
             }
         }
 
@@ -156,25 +189,39 @@ namespace VPNTorrent
             Helper.doLog(scrollViewerLog, "performApplicationAction " + nSelection, m_configHandler.DebugMode, m_configHandler.ConsoleMaxSize);
             if (nSelection == 0)
             {
-                openApp();
+                applicationsClosed.Clear();
             }
             else if (nSelection == 1)
             {
-                unpauseUtorrent();
+                openApp();
             }
-            else if (nSelection == 2)
+
+            if (IsUtorrentConnected && m_configHandler.uTorrentControlEnabled)
             {
-                startUtorrent();
-            }       
+                if (m_configHandler.uTorrentStop)
+                {
+                    startUtorrent();
+                }
+                else
+                {
+                    unpauseUtorrent();
+                }
+            }
         }
 
         private void openApp()
         {
-            if (!isUtorrentOpen())
-            {
-                Helper.doLog(scrollViewerLog, "uTorrent is not open, launching now", true, m_configHandler.ConsoleMaxSize);
-                Process.Start(@"C:\Users\halfmonty\AppData\Roaming\uTorrent\uTorrent.exe");
+            //if (!isUtorrentOpen())
+            //{
+            //    Helper.doLog(scrollViewerLog, "uTorrent is not open, launching now", true, m_configHandler.ConsoleMaxSize);
+            //    Process.Start(@"C:\Users\halfmonty\AppData\Roaming\uTorrent\uTorrent.exe");
+            //}
+
+            foreach( var application in applicationsClosed){
+                Process.Start(application);
+                Helper.doLog(scrollViewerLog, "Re-launching " + application, true, m_configHandler.ConsoleMaxSize);
             }
+            applicationsClosed.Clear();
         }
 
         private void startUtorrent()
@@ -252,9 +299,10 @@ namespace VPNTorrent
         private bool isUtorrentOpen()
         {
             List<String> listApps = getApps();
+            string uTorrent = "utorrent";
             foreach (System.Diagnostics.Process p in System.Diagnostics.Process.GetProcesses())
             {
-                if (listApps.Contains(p.ProcessName) && !isAppOnWhitelist(p.ProcessName))
+                if (uTorrent.Contains(p.ProcessName.ToLower()) && !isAppOnWhitelist(p.ProcessName))
                 {
                     return true;
                 }
@@ -267,8 +315,17 @@ namespace VPNTorrent
             List<String> listApps = getApps();
             foreach (System.Diagnostics.Process p in System.Diagnostics.Process.GetProcesses()) {
                 if (listApps.Contains(p.ProcessName) && !isAppOnWhitelist(p.ProcessName)) {
-                    Helper.doLog(scrollViewerLog, "process found " + p.ProcessName + " with id " + p.Id, true, m_configHandler.ConsoleMaxSize);
+                    Helper.doLog(scrollViewerLog, "process killed: " + p.ProcessName + " with id " + p.Id, true, m_configHandler.ConsoleMaxSize);                 
                     p.Kill();
+                    if (!applicationsClosed.Exists(x => x == p.MainModule.FileName))
+                    {
+                        applicationsClosed.Add(p.MainModule.FileName);
+                        Helper.doLog(scrollViewerLog, "Added " + p.ProcessName + " with id " + p.Id + "to list", true, m_configHandler.ConsoleMaxSize);
+                    }
+                    else
+                    {
+                        Helper.doLog(scrollViewerLog, "" + p.ProcessName + " with id " + p.Id + " already exists in list", true, m_configHandler.ConsoleMaxSize);
+                    }
                  }
             }
         }
@@ -350,6 +407,26 @@ namespace VPNTorrent
             }  else {
                 imageStatus.Source = null ;
                 imageStatus.ToolTip = "";
+            }
+        }
+
+        // Change icon according to uTorrent Enabled Status
+        private void iconUtorrentEnabled(bool? isEnabled)
+        {
+            if (isEnabled == true)
+            {
+                imageUtorrentStatus.Source = new BitmapImage(new Uri("pack://application:,,,/Resources/ok.ico"));
+                imageStatus.ToolTip = "Connected to Utorrent";
+            }
+            else if (isEnabled == false)
+            {
+                imageUtorrentStatus.Source = new BitmapImage(new Uri("pack://application:,,,/Resources/error.ico"));
+                imageStatus.ToolTip = "Utorrent not connected";
+            }
+            else
+            {
+                imageUtorrentStatus.Source = null;
+                imageStatus.ToolTip = null;
             }
         }
 
@@ -455,6 +532,79 @@ namespace VPNTorrent
             ShortcutHandler.removeFromStartup();
         }
 
+        private void utorrentEnabled_Checked(object sender, RoutedEventArgs e)
+        {
+            m_configHandler.uTorrentControlEnabled = true;
+            Helper.doLog(scrollViewerLog, "saving uTorrent Enabled " + comboBoxAction.SelectedIndex, true, m_configHandler.ConsoleMaxSize);
+            m_configHandler.saveValue(ConfigHandler.SETTING.UTORRENT_ENABLED);
+            setupUtorrentConnection();
+            
+        }
+
+        private void utorrentEnabled_Unchecked(object sender, RoutedEventArgs e)
+        {
+            m_configHandler.uTorrentControlEnabled = false;
+            Helper.doLog(scrollViewerLog, "saving uTorrent Disabled " + comboBoxAction.SelectedIndex, true, m_configHandler.ConsoleMaxSize);
+            m_configHandler.saveValue(ConfigHandler.SETTING.UTORRENT_ENABLED);
+            iconUtorrentEnabled(null);
+            IsUtorrentConnected = false;
+        }
+
+        private void textBoxUtorrentUrl_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+            if (!m_bIsInitCompleted)
+            {
+                return;
+            }
+            m_configHandler.uTorrentUrl = textBoxUtorrentUrl.Text;
+            m_configHandler.saveValue(VPNTorrent.ConfigHandler.SETTING.UTORRENT_URL);
+        }
+
+        private void textBoxUtorrentUsername_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+            if (!m_bIsInitCompleted)
+            {
+                return;
+            }
+            m_configHandler.uTorrentUsername = textBoxUtorrentUsername.Text;
+            m_configHandler.saveValue(VPNTorrent.ConfigHandler.SETTING.UTORRENT_USR);
+        }
+
+        private void textBoxUtorrentPassword_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (!m_bIsInitCompleted)
+            {
+                return;
+            }
+            m_configHandler.uTorrentPassword = textBoxUtorrentPassword.Password;
+            m_configHandler.saveValue(VPNTorrent.ConfigHandler.SETTING.UTORRENT_PWD);
+            //textBoxUtorrentPassword.Password;
+        }
+
+        private void RadioButtonStop_Checked(object sender, RoutedEventArgs e)
+        {
+            if (!m_bIsInitCompleted)
+            {
+                return;
+            }
+            m_configHandler.uTorrentStop = (bool)RadioButtonStop.IsChecked;
+            m_configHandler.saveValue(VPNTorrent.ConfigHandler.SETTING.UTORRENT_STOP);
+        }
+
+        private void RadioButtonStop_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (!m_bIsInitCompleted)
+            {
+                return;
+            }
+            m_configHandler.uTorrentStop = (bool)RadioButtonStop.IsChecked;
+            m_configHandler.saveValue(VPNTorrent.ConfigHandler.SETTING.UTORRENT_STOP);
+        }
+
+
+
+
+
 ////////////////////////////////////////////////
 //---------- Minimized UI Events -------------//
 ////////////////////////////////////////////////
@@ -493,5 +643,6 @@ namespace VPNTorrent
                 doMinimize();
             }
         }
+
     }
 }

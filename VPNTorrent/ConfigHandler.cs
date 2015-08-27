@@ -33,6 +33,11 @@ namespace VPNTorrent
         public String VPNInterfaceName { get; set; }
         private List<String> m_ListApplications = new List<String>();
         public Boolean StrictInterfaceHandling { get; set; }
+        public Boolean uTorrentControlEnabled { get; set; }
+        public String uTorrentUrl { get; set; }
+        public String uTorrentUsername { get; set; }
+        public String uTorrentPassword { get; set; }
+        public Boolean uTorrentStop { get; set; }
 
         public List<String> getListApplications() {
             List<String> copy = new List<String>();
@@ -48,6 +53,11 @@ namespace VPNTorrent
         public enum SETTING {
             START_MINIMIZED,
             VPN_ID_AND_NAME,
+            UTORRENT_ENABLED,
+            UTORRENT_URL,
+            UTORRENT_USR,
+            UTORRENT_PWD,
+            UTORRENT_STOP,
             APPLICATIONS,
             STRICT,
             CHOSEN_ACTION
@@ -59,8 +69,43 @@ namespace VPNTorrent
             String[] strValueArray;
             int nValue;
 
+
             DebugMode = getConfigBoolean("DebugMode");
             Helper.doLog(m_viewForLogging, "loadConfigValues start", DebugMode, ConsoleMaxSize);
+
+            uTorrentControlEnabled = getConfigBoolean("uTorrentControlEnabled");
+
+            strValue = getConfigString("uTorrentUrl");
+            if (strValue != null)
+            {
+                uTorrentUrl = strValue.Trim();
+            }
+            else
+            {
+                uTorrentUrl = "";
+            }
+
+            strValue = getConfigString("uTorrentUsername");
+            if (strValue != null)
+            {
+                uTorrentUsername = strValue.Trim();
+            }
+            else
+            {
+                uTorrentUsername = "";
+            }
+
+            strValue = getConfigString("uTorrentPassword");
+            if (strValue != null)
+            {
+                uTorrentPassword = strValue.Trim();
+            }
+            else
+            {
+                uTorrentPassword = "";
+            }
+
+            uTorrentStop = getConfigBoolean("uTorrentStop");
 
             strValue = getConfigString("VPNInterfaceID");
             if (strValue != null) {
@@ -188,6 +233,26 @@ namespace VPNTorrent
                     break;
                 case SETTING.CHOSEN_ACTION:
                     setConfig("ChosenActionIndex", ActionIndex.ToString());
+                    saveConfigfile();
+                    break;
+                case SETTING.UTORRENT_ENABLED:
+                    setConfig("uTorrentControlEnabled", uTorrentControlEnabled.ToString().ToLower());
+                    saveConfigfile();
+                    break;
+                case SETTING.UTORRENT_URL:
+                    setConfig("uTorrentUrl", uTorrentUrl.ToString().ToLower());
+                    saveConfigfile();
+                    break;
+                case SETTING.UTORRENT_USR:
+                    setConfig("uTorrentUsername", uTorrentUsername.ToString().ToLower());
+                    saveConfigfile();
+                    break;
+                case SETTING.UTORRENT_PWD:
+                    setConfig("uTorrentPassword", uTorrentPassword.ToString());
+                    saveConfigfile();
+                    break;
+                case SETTING.UTORRENT_STOP:
+                    setConfig("uTorrentStop", uTorrentStop.ToString().ToLower());
                     saveConfigfile();
                     break;
                 }

@@ -16,3 +16,17 @@ C:\Users\freddi\documents\visual studio 2010\Projects\VPNTorrent\VPNTorrent\obj\
 C:\Users\freddi\documents\visual studio 2010\Projects\VPNTorrent\VPNTorrent\obj\x86\Debug\VPNWatcher.pdb
 C:\Users\freddi\documents\visual studio 2010\Projects\VPNTorrent\VPNTorrent\obj\x86\Debug\VPNTorrent.csproj.GenerateResource.Cache
 C:\Users\freddi\documents\visual studio 2010\Projects\VPNTorrent\VPNTorrent\obj\x86\Debug\App.baml
+G:\programming\C#\VPNWatcher_111\sourcecode\VPNWatcher\VPNTorrent\bin\Debug\VPNWatcher.exe.config
+G:\programming\C#\VPNWatcher_111\sourcecode\VPNWatcher\VPNTorrent\obj\x86\Debug\Interop.IWshRuntimeLibrary.dll
+G:\programming\C#\VPNWatcher_111\sourcecode\VPNWatcher\VPNTorrent\obj\x86\Debug\VPNTorrent.csproj.ResolveComReference.cache
+G:\programming\C#\VPNWatcher_111\sourcecode\VPNWatcher\VPNTorrent\obj\x86\Debug\VPNWatcher.exe
+G:\programming\C#\VPNWatcher_111\sourcecode\VPNWatcher\VPNTorrent\obj\x86\Debug\VPNWatcher.pdb
+G:\programming\C#\VPNWatcher_111\sourcecode\VPNWatcher\VPNTorrent\obj\x86\Debug\VPNTorrent.csprojResolveAssemblyReference.cache
+G:\programming\C#\VPNWatcher_111\sourcecode\VPNWatcher\VPNTorrent\obj\x86\Debug\MainWindow.baml
+G:\programming\C#\VPNWatcher_111\sourcecode\VPNWatcher\VPNTorrent\obj\x86\Debug\App.baml
+G:\programming\C#\VPNWatcher_111\sourcecode\VPNWatcher\VPNTorrent\obj\x86\Debug\MainWindow.g.cs
+G:\programming\C#\VPNWatcher_111\sourcecode\VPNWatcher\VPNTorrent\obj\x86\Debug\App.g.cs
+G:\programming\C#\VPNWatcher_111\sourcecode\VPNWatcher\VPNTorrent\obj\x86\Debug\VPNWatcher_MarkupCompile.cache
+G:\programming\C#\VPNWatcher_111\sourcecode\VPNWatcher\VPNTorrent\obj\x86\Debug\VPNWatcher.g.resources
+G:\programming\C#\VPNWatcher_111\sourcecode\VPNWatcher\VPNTorrent\obj\x86\Debug\VPNTorrent.Properties.Resources.resources
+G:\programming\C#\VPNWatcher_111\sourcecode\VPNWatcher\VPNTorrent\obj\x86\Debug\VPNTorrent.csproj.GenerateResource.Cache
