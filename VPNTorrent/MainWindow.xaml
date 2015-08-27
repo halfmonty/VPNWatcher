@@ -1,0 +1,42 @@
+﻿<Window x:Class="VPNTorrent.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="VPN Watcher 1.1" Height="399" Width="488" BorderThickness="1" Closed="onExit" Icon="./Resources/logo.ico" StateChanged="onStateChanged" ResizeMode="CanMinimize">
+    <Grid Width="457" Height="359">
+        <CheckBox Content="Start minimized" Height="16" HorizontalAlignment="Left" Margin="328,323,0,0" Name="checkBoxMinimized" VerticalAlignment="Top" Checked="checkBoxMinimized_Checked" Unchecked="checkBoxMinimized_Unchecked" />
+        <ListBox Height="69" HorizontalAlignment="Right" Margin="0,12,92,0" Name="listBoxInterfaces" VerticalAlignment="Top" Width="293"/>
+        <Label Content="Interfaces" Height="28" HorizontalAlignment="Left" Margin="5,32,0,0" Name="labelIPs" VerticalAlignment="Top" />
+        <ComboBox Height="23" HorizontalAlignment="Right" Margin="0,151,82,0" Name="comboBoxAction" VerticalAlignment="Top" Width="78" SelectionChanged="onActionChange">
+            <ComboBoxItem Content="Kill App" />
+            <ComboBoxItem Content="Pause Torrents"/>
+            <ComboBoxItem Content="Stop Torrents"/>
+        </ComboBox>
+        <Label Content="Log" Height="28" HorizontalAlignment="Left" Margin="12,237,0,0" Name="labelLog" VerticalAlignment="Top" />
+        <ScrollViewer Height="101" HorizontalAlignment="Left" Margin="51,203,0,0" Name="scrollViewerLog" VerticalAlignment="Top" Width="377" BorderThickness="4" BorderBrush="Black" IsManipulationEnabled="False" HorizontalScrollBarVisibility="Visible" />
+        <Label Content="Apps" HorizontalAlignment="Left" Margin="12,146,0,178" Name="label1" Width="40" />
+        <TextBox AcceptsReturn="True" Height="56" HorizontalAlignment="Left" Margin="51,136,0,0" Name="textBoxApps" TextWrapping="Wrap" VerticalAlignment="Top" Width="136" VerticalScrollBarVisibility="Auto" TextChanged="onAppsChange" />
+        <Label Content="App Action" Height="28" HorizontalAlignment="Left" Margin="222,149,0,0" Name="label3" VerticalAlignment="Top" />
+        <Button Height="56" HorizontalAlignment="Right" Margin="0,22,25,0" Name="buttonSetVPN" VerticalAlignment="Top" Width="57" Click="buttonSetVPN_Click" ToolTip="Save VPN">
+            <Button.Style>
+                <Style TargetType="{x:Type Button}">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="{x:Type Button}">
+                                <Image x:Name="image" Source="Resources/save_normal.ico" Margin="8" />
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="true">
+                                        <Setter TargetName="image" Property="Source" Value="Resources/save_high.ico" />
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </Button.Style>
+        </Button>
+        <TextBox Height="23" HorizontalAlignment="Left" Margin="72,99,0,0" Name="textBoxSelectedInterface" VerticalAlignment="Top" Width="293" IsEnabled="True" IsReadOnly="True" />
+        <Image Height="23" HorizontalAlignment="Left" Margin="386,99,0,0" Name="imageStatus" Stretch="Fill" VerticalAlignment="Top" Width="28" />
+        <CheckBox Content="Strict Mode" Height="16" HorizontalAlignment="Left" Margin="204,323,0,0" x:Name="checkBoxStrict" VerticalAlignment="Top" Checked="checkBoxStrict_Checked" Unchecked="checkBoxStrict_Unchecked" />
+        <CheckBox Content="Start with Windows" Height="16" HorizontalAlignment="Left" Margin="51,323,0,0" x:Name="checkBoxStartup" VerticalAlignment="Top" Checked="checkBoxStartup_Checked" Unchecked="checkBoxStartup_Unchecked" />
+    </Grid>
+</Window>

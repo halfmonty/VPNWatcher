@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<configuration>
+  <appSettings>
+    <add key="TimerInSeconds" value="2" />
+    <add key="ChosenActionIndex" value="2" />
+    <add key="ConsoleMaxSize" value="10000" />
+    <add key="Applications" value="uTorrent#firefox" />
+    <add key="IgnoreIPV6" value="true" />
+    <add key="StartMinimized" value="false" />
+    <add key="VPN-IPs" value="10.4#10.5" />
+  </appSettings>
+</configuration>
