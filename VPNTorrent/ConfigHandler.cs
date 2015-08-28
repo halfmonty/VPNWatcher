@@ -8,7 +8,7 @@ using System.Windows.Controls;
 
 namespace VPNTorrent
 {
-    class ConfigHandler
+    public class ConfigHandler
     {
         Configuration m_config = null;
         ScrollViewer m_viewForLogging = null;

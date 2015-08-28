@@ -102,8 +102,10 @@
     <Compile Include="Helper.cs" />
     <Compile Include="ConfigHandler.cs" />
     <Compile Include="InterfaceHandler.cs" />
+    <Compile Include="ProcessHandler.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="ShortcutHandler.cs" />
+    <Compile Include="UtorrentHandler.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

@@ -24,20 +24,17 @@ namespace VPNTorrent
 
 //-------- Initialization -------//
 
-        // these apps should never get killed
-        ArrayList listWhilelist = new ArrayList(){ "explorer", "csrss", "dwm", "services" };
-        UTorrentClient client;
+        
 
         NotifyIcon m_nIcon = null;
         DispatcherTimer m_dispatcherTimer = null;
 
-        ConfigHandler m_configHandler = null;
+        public ConfigHandler m_configHandler = null;
         InterfaceHandler m_interfaceHandler = null;
+        List<NetworkInterface> listNetworks;
+        NetworkInterface selectedNetworkInterface;
 
         Boolean m_bIsInitCompleted = false;
-        List<Torrent> torrentsHandled = new List<Torrent>();
-        List<string> applicationsClosed = new List<string>();
-        bool IsUtorrentConnected = false;
 
         public enum STATUS {
             VPN_CONNECTED,
@@ -54,9 +51,6 @@ namespace VPNTorrent
             // read and display config values
             m_configHandler.loadConfigValues();
             showConfigValues();
-
-
-
 
             setupTimer();
 
@@ -89,9 +83,7 @@ namespace VPNTorrent
             textBoxUtorrentUsername.Text = m_configHandler.uTorrentUsername;
             textBoxUtorrentPassword.Password = m_configHandler.uTorrentPassword;
             RadioButtonPause.IsChecked = !m_configHandler.uTorrentStop;
-
         }
-
 
         // the minimize-to-tray feature
         private void setupNotifyIcon() {
@@ -119,214 +111,115 @@ namespace VPNTorrent
             m_dispatcherTimer.Start();
         }
         
+
 //------ Functions -------//
 
-        // setup uTorrent Client and validate connection
-        private void setupUtorrentConnection()
+
+        // callback function by the timer
+        private void dispatcherTimer_Tick(object sender, EventArgs e)
         {
-            client = new UTorrentClient(new System.Uri(m_configHandler.uTorrentUrl), m_configHandler.uTorrentUsername, m_configHandler.uTorrentPassword);
+            Helper.doLog(scrollViewerLog, "dispatcherTimer_Tick", m_configHandler.DebugMode, m_configHandler.ConsoleMaxSize);
+
             try
             {
-                var test = client.Torrents.Count;
-                IsUtorrentConnected = true;
-                
-            }
-            catch (Exception e)
-            {
-                IsUtorrentConnected = false;
-            }
-            iconUtorrentEnabled(IsUtorrentConnected);
-        }
+                updateNetworkInterfaces();
+                selectedNetworkInterface = m_interfaceHandler.getNetworkDetails(m_configHandler.VPNInterfaceID);
 
-        // minimize the app to the trayicon
-        private void doMinimize() {
-            Helper.doLog(scrollViewerLog, "doMinimize", m_configHandler.DebugMode, m_configHandler.ConsoleMaxSize);
-
-            m_nIcon.Visible = true;
-            Hide();
-            WindowState = WindowState.Minimized;
-        }
-
-        // maximize the app 
-        private void doMaximize() {
-            Helper.doLog(scrollViewerLog, "doMaximize", m_configHandler.DebugMode, m_configHandler.ConsoleMaxSize);
-
-            m_nIcon.Visible = false;
-            Show();
-            WindowState = WindowState.Normal;
-
-            Activate();
-            Focus();
-        }
-
-        private void performApplicationAction() {
-            int nSelection = m_configHandler.ActionIndex;
-
-            Helper.doLog(scrollViewerLog, "performApplicationAction " + nSelection, m_configHandler.DebugMode, m_configHandler.ConsoleMaxSize);
-            if (nSelection == 0) {
-                closeApp();
-            } else if (nSelection == 1) {
-                closeApp();
-            }
-
-            if (IsUtorrentConnected && m_configHandler.uTorrentControlEnabled)
-            {
-                if (m_configHandler.uTorrentStop)
-                {
-                    stopUtorrent();
-                }
-                else
-                {
-                    pauseUtorrent();
+                if (m_configHandler.StrictInterfaceHandling) {
+                    strictVPNCheck(selectedNetworkInterface);
+                } else {
+                    regularVPNCheck(selectedNetworkInterface);
                 }
             }
+            catch (Exception excep)
+            {
+                Helper.doLog(scrollViewerLog, "Exception\r\n" + Helper.FlattenException(excep), m_configHandler.DebugMode, m_configHandler.ConsoleMaxSize);
+            }
         }
 
-        private void performVpnConnectedApplicationAction()
+        // update UI with any missing network interfaces
+        private void updateNetworkInterfaces()
         {
-            int nSelection = m_configHandler.ActionIndex;
-
-            Helper.doLog(scrollViewerLog, "performApplicationAction " + nSelection, m_configHandler.DebugMode, m_configHandler.ConsoleMaxSize);
-            if (nSelection == 0)
+            listNetworks = m_interfaceHandler.getActiveNetworkInterfaces();
+            if (listBoxInterfaces.Items.Count != listNetworks.Count)
             {
-                applicationsClosed.Clear();
-            }
-            else if (nSelection == 1)
-            {
-                openApp();
-            }
-
-            if (IsUtorrentConnected && m_configHandler.uTorrentControlEnabled)
-            {
-                if (m_configHandler.uTorrentStop)
-                {
-                    startUtorrent();
-                }
-                else
-                {
-                    unpauseUtorrent();
-                }
+                Helper.doLog(scrollViewerLog, "network list changed, updating ...", true, m_configHandler.ConsoleMaxSize);
+                showNetworkInterfaces(listNetworks);
             }
         }
 
-        private void openApp()
+        // insert the connected networks into the listbox
+        private void showNetworkInterfaces(List<NetworkInterface> listInterfaces)
         {
-            //if (!isUtorrentOpen())
-            //{
-            //    Helper.doLog(scrollViewerLog, "uTorrent is not open, launching now", true, m_configHandler.ConsoleMaxSize);
-            //    Process.Start(@"C:\Users\halfmonty\AppData\Roaming\uTorrent\uTorrent.exe");
-            //}
+            Helper.doLog(scrollViewerLog, "showNetworkInterfaces", m_configHandler.DebugMode, m_configHandler.ConsoleMaxSize);
 
-            foreach( var application in applicationsClosed){
-                Process.Start(application);
-                Helper.doLog(scrollViewerLog, "Re-launching " + application, true, m_configHandler.ConsoleMaxSize);
-            }
-            applicationsClosed.Clear();
-        }
-
-        private void startUtorrent()
-        {
-            if (isUtorrentOpen())
+            listBoxInterfaces.Items.Clear();
+            foreach (NetworkInterface i in listInterfaces)
             {
-                foreach (var torrent in torrentsHandled)
+                String description = i.Description;
+                if (i.GetIPProperties() != null && i.GetIPProperties().UnicastAddresses != null && i.GetIPProperties().UnicastAddresses.Count > 0)
                 {
-                    Helper.doLog(scrollViewerLog, "Starting Torrent " + torrent.Name, true, m_configHandler.ConsoleMaxSize);
-                    torrent.Start();
+                    description += " " + i.GetIPProperties().UnicastAddresses[0].Address;
                 }
-                torrentsHandled.Clear();
+                listBoxInterfaces.Items.Add(description);
             }
         }
 
-        private void unpauseUtorrent()
+        // Check if VPN is connected
+        private bool strictVPNCheck(NetworkInterface selectedNetworkInterface)
         {
-            if (isUtorrentOpen())
-            {
-                foreach (var torrent in torrentsHandled)
-                {
-                    Helper.doLog(scrollViewerLog, "UnPausing Torrent " + torrent.Name, true, m_configHandler.ConsoleMaxSize);
-                    torrent.Unpause();
-                }
-                torrentsHandled.Clear();
-            }
-        }
-
-        private void pauseUtorrent() 
-        {
-            //doLog("pauseUtorrent");            
-            if (isUtorrentOpen())
-            {
-                foreach (var torrent in client.Torrents)
-                {
-                    if (!torrent.StatusMessage.ToLower().Contains("finished") &&
-                        !torrent.StatusMessage.ToLower().Contains("error") &&
-                        !torrent.StatusMessage.ToLower().Contains("stopped") &&
-                        !torrent.StatusMessage.ToLower().Contains("paused"))
-                    {
-                        if (!torrentsHandled.Exists(x => x.Name == torrent.Name))
-                        {
-                            Helper.doLog(scrollViewerLog, "Pausing Torrent " + torrent.Name, true, m_configHandler.ConsoleMaxSize);
-                            torrentsHandled.Add(torrent);
-                            torrent.Pause();
-                        }
-                    }
-                }
-            }
-        }
-
-        private void stopUtorrent()
-        {            
-            //doLog("stopUtorrent");
-            if (isUtorrentOpen())
-            {                
-                foreach (var torrent in client.Torrents)
-                {
-                    if (!torrent.StatusMessage.ToLower().Contains("finished") && 
-                        !torrent.StatusMessage.ToLower().Contains("error") &&
-                        !torrent.StatusMessage.ToLower().Contains("stopped") &&
-                        !torrent.StatusMessage.ToLower().Contains("paused"))
-                    {
-                        if (!torrentsHandled.Exists(x => x.Name == torrent.Name))
-                        {
-                            Helper.doLog(scrollViewerLog, "Stopping Torrent " + torrent.Name, true, m_configHandler.ConsoleMaxSize);
-                            torrentsHandled.Add(torrent);
-                            torrent.Stop();
-                        }
-                    }
-                }
-            }
-        }
-
-        private bool isUtorrentOpen()
-        {
-            List<String> listApps = getApps();
-            string uTorrent = "utorrent";
-            foreach (System.Diagnostics.Process p in System.Diagnostics.Process.GetProcesses())
-            {
-                if (uTorrent.Contains(p.ProcessName.ToLower()) && !isAppOnWhitelist(p.ProcessName))
-                {
-                    return true;
-                }
+            Helper.doLog(scrollViewerLog, "dispatcherTimer_Tick strictmode VPN=" + m_configHandler.VPNInterfaceID + " select=" + selectedNetworkInterface, m_configHandler.DebugMode, m_configHandler.ConsoleMaxSize);
+            if (!String.IsNullOrWhiteSpace(m_configHandler.VPNInterfaceID) && selectedNetworkInterface != null && m_interfaceHandler.isNetworkConnected(selectedNetworkInterface)) {
+                performVpnConnectedApplicationAction();
+                iconAction(STATUS.VPN_CONNECTED);
+                return true;
             }
             return false;
         }
 
-        // kill an application by its process name
-        private void closeApp() {
-            List<String> listApps = getApps();
-            foreach (System.Diagnostics.Process p in System.Diagnostics.Process.GetProcesses()) {
-                if (listApps.Contains(p.ProcessName) && !isAppOnWhitelist(p.ProcessName)) {
-                    Helper.doLog(scrollViewerLog, "process killed: " + p.ProcessName + " with id " + p.Id, true, m_configHandler.ConsoleMaxSize);                 
-                    p.Kill();
-                    if (!applicationsClosed.Exists(x => x == p.MainModule.FileName))
-                    {
-                        applicationsClosed.Add(p.MainModule.FileName);
-                        Helper.doLog(scrollViewerLog, "Added " + p.ProcessName + " with id " + p.Id + "to list", true, m_configHandler.ConsoleMaxSize);
-                    }
-                    else
-                    {
-                        Helper.doLog(scrollViewerLog, "" + p.ProcessName + " with id " + p.Id + " already exists in list", true, m_configHandler.ConsoleMaxSize);
-                    }
-                 }
+        // Check if VPN is connected
+        private void regularVPNCheck(NetworkInterface selectedNetworkInterface)
+        {
+            if (selectedNetworkInterface == null){
+                iconAction(STATUS.UNDEFINED);
+            } else if (selectedNetworkInterface != null && !m_interfaceHandler.isNetworkConnected(selectedNetworkInterface)) {
+                performApplicationAction();
+                iconAction(STATUS.VPN_NOT_CONNECTED);
+            }else if (selectedNetworkInterface != null && m_interfaceHandler.isNetworkConnected(selectedNetworkInterface)) {
+                performVpnConnectedApplicationAction();
+                iconAction(STATUS.VPN_CONNECTED);
+            }
+        }
+
+        // performed when VPN disconnects
+        private void performApplicationAction() {
+            ProcessHandler.closeApps(getApps());
+
+            if (UtorrentHandler.IsUtorrentConnected && m_configHandler.uTorrentControlEnabled) {
+                if (m_configHandler.uTorrentStop) {
+                    UtorrentHandler.StopUtorrent();
+                } else {
+                    UtorrentHandler.PauseUtorrent();
+                }
+            }
+        }
+
+        // performed when VPN connects
+        private void performVpnConnectedApplicationAction()
+        {
+            //Helper.doLog(scrollViewerLog, "performApplicationAction " + nSelection, m_configHandler.DebugMode, m_configHandler.ConsoleMaxSize);
+            if (m_configHandler.ActionIndex == 0){
+                ProcessHandler.clearApplicationsList();
+            } else {
+                ProcessHandler.openApps();
+            }
+
+            if (UtorrentHandler.IsUtorrentConnected && m_configHandler.uTorrentControlEnabled) {
+                if (m_configHandler.uTorrentStop) {
+                    UtorrentHandler.StartUtorrent();
+                } else {
+                    UtorrentHandler.UnpauseUtorrent();
+                }
             }
         }
 
@@ -343,57 +236,7 @@ namespace VPNTorrent
                     }              
                 }
             }
-
             return listApps;
-        }
-
-        // we have a whitelist, check against it before killing
-        private Boolean isAppOnWhitelist(String strApp) {
-            Helper.doLog(scrollViewerLog, "isAppOnWhitelist " + strApp, m_configHandler.DebugMode, m_configHandler.ConsoleMaxSize);
-
-            if (listWhilelist.Contains(strApp)) {
-                 Helper.doLog(scrollViewerLog, "app " + strApp + " is on whitelist and connet be killed", true, m_configHandler.ConsoleMaxSize);
-                return true;
-            }
-
-            return false;
-        }
-
-        // callback funtcion by the timer
-        private void dispatcherTimer_Tick(object sender, EventArgs e) {
-            Helper.doLog(scrollViewerLog, "dispatcherTimer_Tick", m_configHandler.DebugMode, m_configHandler.ConsoleMaxSize);
-
-            try {
-                List<NetworkInterface> listNetworks = m_interfaceHandler.getActiveNetworkInterfaces();
-                if (listBoxInterfaces.Items.Count != listNetworks.Count) {
-                    Helper.doLog(scrollViewerLog, "network list changed, updating ...", true, m_configHandler.ConsoleMaxSize);
-                    showNetworkInterfaces(listNetworks);
-                }
-
-                NetworkInterface selected = m_interfaceHandler.getNetworkDetails(m_configHandler.VPNInterfaceID);
-                if (m_configHandler.StrictInterfaceHandling) {
-                    Helper.doLog(scrollViewerLog, "dispatcherTimer_Tick strictmode VPN=" + m_configHandler.VPNInterfaceID + " select=" + selected, m_configHandler.DebugMode, m_configHandler.ConsoleMaxSize);
-                    if (m_configHandler.VPNInterfaceID != "" && (selected == null || !m_interfaceHandler.isNetworkConnected(selected))) {
-                        performApplicationAction();
-                        iconAction(STATUS.VPN_NOT_CONNECTED);
-                    } else if (m_configHandler.VPNInterfaceID != "" && selected != null && m_interfaceHandler.isNetworkConnected(selected)) {
-                        performVpnConnectedApplicationAction();
-                        iconAction(STATUS.VPN_CONNECTED);
-                    }
-                } else {
-                    if (selected == null) {
-                        iconAction(STATUS.UNDEFINED);
-                    } else if (selected != null && !m_interfaceHandler.isNetworkConnected(selected)) {
-                        performApplicationAction();
-                        iconAction(STATUS.VPN_NOT_CONNECTED);
-                    } else if (selected != null && m_interfaceHandler.isNetworkConnected(selected)) {
-                        performVpnConnectedApplicationAction();
-                        iconAction(STATUS.VPN_CONNECTED);
-                    }
-                }
-            } catch (Exception excep) {
-                Helper.doLog(scrollViewerLog, "Exception\r\n" + Helper.FlattenException(excep), m_configHandler.DebugMode, m_configHandler.ConsoleMaxSize);
-            }
         }
 
         // change the icon according to the VPN status
@@ -411,59 +254,45 @@ namespace VPNTorrent
         }
 
         // Change icon according to uTorrent Enabled Status
-        private void iconUtorrentEnabled(bool? isEnabled)
-        {
-            if (isEnabled == true)
-            {
+        private void iconUtorrentConnected(bool? isEnabled) {
+            if (isEnabled == true) {
                 imageUtorrentStatus.Source = new BitmapImage(new Uri("pack://application:,,,/Resources/ok.ico"));
                 imageStatus.ToolTip = "Connected to Utorrent";
-            }
-            else if (isEnabled == false)
-            {
+            } else if (isEnabled == false) {
                 imageUtorrentStatus.Source = new BitmapImage(new Uri("pack://application:,,,/Resources/error.ico"));
                 imageStatus.ToolTip = "Utorrent not connected";
-            }
-            else
-            {
+            } else {
                 imageUtorrentStatus.Source = null;
                 imageStatus.ToolTip = null;
             }
         }
 
-        // insert the connected networks into the listbox
-        private void showNetworkInterfaces(List<NetworkInterface> listInterfaces) {
-            Helper.doLog(scrollViewerLog, "showNetworkInterfaces", m_configHandler.DebugMode, m_configHandler.ConsoleMaxSize);
 
-            listBoxInterfaces.Items.Clear();
-            foreach (NetworkInterface i in listInterfaces)  {
-                String description = i.Description;
-                if (i.GetIPProperties() != null && i.GetIPProperties().UnicastAddresses != null && i.GetIPProperties().UnicastAddresses.Count > 0) {
-                    description += " " + i.GetIPProperties().UnicastAddresses[0].Address;
-                }
-                listBoxInterfaces.Items.Add(description);
-            }
-        }
-        
-
-        // user clicked on the save button: look up the dtails of the selected interface and save it
-        private void buttonSetVPN_Click(object sender, RoutedEventArgs e) {
-            Object objSelected = listBoxInterfaces.SelectedValue;
-            if (objSelected != null) {
-                String strID = m_interfaceHandler.findSelectedInterface(objSelected.ToString());
-                if (strID != null) {
-                    m_configHandler.VPNInterfaceID = strID;
-                    textBoxSelectedInterface.Text = m_interfaceHandler.getNetworkDetails(strID).Description;
-                    m_configHandler.VPNInterfaceName = textBoxSelectedInterface.Text;
-                    m_configHandler.saveValue(VPNTorrent.ConfigHandler.SETTING.VPN_ID_AND_NAME);
-                } else {
-                    Helper.doLog(scrollViewerLog, "selected interface not found " + strID, true, m_configHandler.ConsoleMaxSize);
-                }
-            }
-        }
 
 //////////////////////////////////////
 //---------- UI Events -------------//
 //////////////////////////////////////
+
+        // user clicked on the save button: look up the dtails of the selected interface and save it
+        private void buttonSetVPN_Click(object sender, RoutedEventArgs e)
+        {
+            Object objSelected = listBoxInterfaces.SelectedValue;
+            if (objSelected != null)
+            {
+                String strID = m_interfaceHandler.findSelectedInterface(objSelected.ToString());
+                if (strID != null)
+                {
+                    m_configHandler.VPNInterfaceID = strID;
+                    textBoxSelectedInterface.Text = m_interfaceHandler.getNetworkDetails(strID).Description;
+                    m_configHandler.VPNInterfaceName = textBoxSelectedInterface.Text;
+                    m_configHandler.saveValue(VPNTorrent.ConfigHandler.SETTING.VPN_ID_AND_NAME);
+                }
+                else
+                {
+                    Helper.doLog(scrollViewerLog, "selected interface not found " + strID, true, m_configHandler.ConsoleMaxSize);
+                }
+            }
+        }
 
         private void checkBoxMinimized_Checked(object sender, RoutedEventArgs e)
         {
@@ -537,8 +366,7 @@ namespace VPNTorrent
             m_configHandler.uTorrentControlEnabled = true;
             Helper.doLog(scrollViewerLog, "saving uTorrent Enabled " + comboBoxAction.SelectedIndex, true, m_configHandler.ConsoleMaxSize);
             m_configHandler.saveValue(ConfigHandler.SETTING.UTORRENT_ENABLED);
-            setupUtorrentConnection();
-            
+            iconUtorrentConnected(UtorrentHandler.SetupUtorrentConnection(m_configHandler));
         }
 
         private void utorrentEnabled_Unchecked(object sender, RoutedEventArgs e)
@@ -546,8 +374,7 @@ namespace VPNTorrent
             m_configHandler.uTorrentControlEnabled = false;
             Helper.doLog(scrollViewerLog, "saving uTorrent Disabled " + comboBoxAction.SelectedIndex, true, m_configHandler.ConsoleMaxSize);
             m_configHandler.saveValue(ConfigHandler.SETTING.UTORRENT_ENABLED);
-            iconUtorrentEnabled(null);
-            IsUtorrentConnected = false;
+            iconUtorrentConnected(null);
         }
 
         private void textBoxUtorrentUrl_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
@@ -642,6 +469,29 @@ namespace VPNTorrent
             {
                 doMinimize();
             }
+        }
+
+        // minimize the app to the trayicon
+        private void doMinimize()
+        {
+            Helper.doLog(scrollViewerLog, "doMinimize", m_configHandler.DebugMode, m_configHandler.ConsoleMaxSize);
+
+            m_nIcon.Visible = true;
+            Hide();
+            WindowState = WindowState.Minimized;
+        }
+
+        // maximize the app 
+        private void doMaximize()
+        {
+            Helper.doLog(scrollViewerLog, "doMaximize", m_configHandler.DebugMode, m_configHandler.ConsoleMaxSize);
+
+            m_nIcon.Visible = false;
+            Show();
+            WindowState = WindowState.Normal;
+
+            Activate();
+            Focus();
         }
 
     }
