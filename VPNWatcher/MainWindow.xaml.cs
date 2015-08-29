@@ -111,7 +111,11 @@ namespace VPNWatcher
         private void setupTimer() {
             m_dispatcherTimer = new DispatcherTimer();
             m_dispatcherTimer.Tick += new EventHandler(dispatcherTimer_Tick);
+<<<<<<< HEAD
             m_dispatcherTimer.Interval = new TimeSpan(0, 0, m_configHandler.TimerInMilliseconds);
+=======
+            m_dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, m_configHandler.TimerInMilliSeconds);
+>>>>>>> origin/master
             m_dispatcherTimer.Start();
         }
         
