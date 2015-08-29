@@ -26,7 +26,7 @@ namespace VPNWatcher
         public int ConsoleMaxSize { get; set; }
         public Boolean IgnoreIPV6 { get; set; }
         public Boolean StartMinimized { get; set; }
-        public int TimerInSeconds { get; set; }
+        public int TimerInMilliseconds { get; set; }
         public Boolean DebugMode { get; set; }
         public int ActionIndex { get; set; }
         public String VPNInterfaceID { get; set; }
@@ -150,11 +150,11 @@ namespace VPNWatcher
                 ConsoleMaxSize = 10000;
             }
 
-            nValue = getConfigInt("TimerInSeconds");
+            nValue = getConfigInt("TimerInMilliseconds");
             if (nValue <= 0) {
                 nValue = 2;
             }
-            TimerInSeconds = nValue;
+            TimerInMilliseconds = nValue;
 
             //bIgnoreIPV6 = getConfigBoolean("IgnoreIPV6");
             StartMinimized = getConfigBoolean("StartMinimized");

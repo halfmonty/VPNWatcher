@@ -13,6 +13,7 @@ using System.Text;
 using System.Reflection;
 using System.IO;
 using UTorrentAPI;
+using System.Threading;
 
 namespace VPNWatcher
 {
@@ -33,31 +34,35 @@ namespace VPNWatcher
         NetworkInterface selectedNetworkInterface;
 
         Boolean m_bIsInitCompleted = false;
+        Stopwatch watch = new Stopwatch();
 
         public enum STATUS {
             VPN_CONNECTED,
-            VPN_NOT_CONNECTED,
-            UNDEFINED
+            VPN_NOT_CONNECTED
         };
 
         public MainWindow() {
             InitializeComponent();
+            init();
+        }
 
+        // initialize all custom variables
+        private void init()
+        {
             m_configHandler = new ConfigHandler(scrollViewerLog);
             m_interfaceHandler = new InterfaceHandler(scrollViewerLog, m_configHandler);
             Helper.view = scrollViewerLog;
+            UtorrentHandler.statusIcon = imageUtorrentStatus;
 
             // read and display config values
             m_configHandler.loadConfigValues();
             showConfigValues();
 
             setupTimer();
-
             setupNotifyIcon();
 
-            if (m_configHandler.StartMinimized) {
+            if (m_configHandler.StartMinimized)
                 doMinimize();
-            }
 
             m_bIsInitCompleted = true;
         }
@@ -106,7 +111,7 @@ namespace VPNWatcher
         private void setupTimer() {
             m_dispatcherTimer = new DispatcherTimer();
             m_dispatcherTimer.Tick += new EventHandler(dispatcherTimer_Tick);
-            m_dispatcherTimer.Interval = new TimeSpan(0, 0, m_configHandler.TimerInSeconds);
+            m_dispatcherTimer.Interval = new TimeSpan(0, 0, m_configHandler.TimerInMilliseconds);
             m_dispatcherTimer.Start();
         }
         
@@ -117,23 +122,30 @@ namespace VPNWatcher
         // callback function by the timer
         private void dispatcherTimer_Tick(object sender, EventArgs e)
         {
-            Helper.doLog("dispatcherTimer_Tick", m_configHandler.DebugMode);
+            watch.Start();
+            Helper.doLog("dispatcherTimer_Tick");//, m_configHandler.DebugMode);
 
             try
             {
                 updateNetworkInterfaces();
                 selectedNetworkInterface = m_interfaceHandler.getNetworkDetails(m_configHandler.VPNInterfaceID);
+                bool? status = null;
 
                 if (m_configHandler.StrictInterfaceHandling) {
-                    strictVPNCheck(selectedNetworkInterface);
+                    status = strictVPNCheck(selectedNetworkInterface);
                 } else {
-                    regularVPNCheck(selectedNetworkInterface);
+                    status = regularVPNCheck(selectedNetworkInterface);
                 }
+                iconVpnStatus(status);
             }
             catch (Exception excep)
             {
                 Helper.doLog("Exception\r\n" + Helper.FlattenException(excep), m_configHandler.DebugMode);
             }
+
+            Helper.doLog(""+watch.ElapsedMilliseconds);
+            watch.Stop();
+            watch.Reset();            
         }
 
         // update UI with any missing network interfaces
@@ -177,17 +189,18 @@ namespace VPNWatcher
         }
 
         // Check if VPN is connected
-        private void regularVPNCheck(NetworkInterface selectedNetworkInterface)
+        private bool? regularVPNCheck(NetworkInterface selectedNetworkInterface)
         {
             if (selectedNetworkInterface == null){
-                iconAction(STATUS.UNDEFINED);
+                return null;
             } else if (selectedNetworkInterface != null && !m_interfaceHandler.isNetworkConnected(selectedNetworkInterface)) {
                 performApplicationAction();
-                iconAction(STATUS.VPN_NOT_CONNECTED);
+                return false;
             }else if (selectedNetworkInterface != null && m_interfaceHandler.isNetworkConnected(selectedNetworkInterface)) {
                 performVpnConnectedApplicationAction();
-                iconAction(STATUS.VPN_CONNECTED);
+                return true;
             }
+            return null;
         }
 
         // performed when VPN disconnects
@@ -222,6 +235,7 @@ namespace VPNWatcher
             }
         }
 
+
         // read the apps from the textbox. TODO: data binding?
         private List<String> getApps() {
             List<String> listApps = new List<String>();
@@ -252,16 +266,16 @@ namespace VPNWatcher
             }
         }
 
-        // Change icon according to uTorrent Enabled Status
-        private void iconUtorrentConnected(bool? isEnabled) {
-            if (isEnabled == true) {
-                imageUtorrentStatus.Source = new BitmapImage(new Uri("pack://application:,,,/Resources/ok.ico"));
-                imageStatus.ToolTip = "Connected to Utorrent";
-            } else if (isEnabled == false) {
-                imageUtorrentStatus.Source = new BitmapImage(new Uri("pack://application:,,,/Resources/error.ico"));
-                imageStatus.ToolTip = "Utorrent not connected";
+        private void iconVpnStatus(bool? isVpnConnected)
+        {
+            if (isVpnConnected == true) {
+                imageStatus.Source = new BitmapImage(new Uri("pack://application:,,,/Resources/ok.ico"));
+                imageStatus.ToolTip = "VPN Connected";
+            } else if (isVpnConnected == false) {
+                imageStatus.Source = new BitmapImage(new Uri("pack://application:,,,/Resources/error.ico"));
+                imageStatus.ToolTip = "VPN not connected";
             } else {
-                imageUtorrentStatus.Source = null;
+                imageStatus.Source = null;
                 imageStatus.ToolTip = null;
             }
         }
@@ -365,7 +379,7 @@ namespace VPNWatcher
             m_configHandler.uTorrentControlEnabled = true;
             Helper.doLog("saving uTorrent Enabled " + comboBoxAction.SelectedIndex);
             m_configHandler.saveValue(ConfigHandler.SETTING.UTORRENT_ENABLED);
-            iconUtorrentConnected(UtorrentHandler.SetupUtorrentConnection(m_configHandler));
+            UtorrentHandler.SetupUtorrentConnection(m_configHandler);
         }
 
         private void utorrentEnabled_Unchecked(object sender, RoutedEventArgs e)
@@ -373,7 +387,7 @@ namespace VPNWatcher
             m_configHandler.uTorrentControlEnabled = false;
             Helper.doLog("saving uTorrent Disabled " + comboBoxAction.SelectedIndex);
             m_configHandler.saveValue(ConfigHandler.SETTING.UTORRENT_ENABLED);
-            iconUtorrentConnected(null);
+            imageUtorrentStatus.Source = null;
         }
 
         private void textBoxUtorrentUrl_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)

@@ -36,16 +36,16 @@ namespace VPNWatcher
             {
                 if (listApps.Contains(p.ProcessName) && !isAppOnWhitelist(p.ProcessName))
                 {
-                    //Helper.doLog(scrollViewerLog, "process killed: " + p.ProcessName + " with id " + p.Id, true, m_configHandler.ConsoleMaxSize);
+                    Helper.doLog("process killed: " + p.ProcessName + " with id " + p.Id);
                     p.Kill();
                     if (!_applicationsClosed.Exists(x => x == p.MainModule.FileName))
                     {
                         _applicationsClosed.Add(p.MainModule.FileName);
-                        //Helper.doLog(scrollViewerLog, "Added " + p.ProcessName + " with id " + p.Id + "to list", true, m_configHandler.ConsoleMaxSize);
+                        Helper.doLog("Added " + p.ProcessName + " with id " + p.Id + "to list");
                     }
                     else
                     {
-                        //Helper.doLog(scrollViewerLog, "" + p.ProcessName + " with id " + p.Id + " already exists in list", true, m_configHandler.ConsoleMaxSize);
+                        Helper.doLog(p.ProcessName + " with id " + p.Id + " already exists in list");
                     }
                 }
             }
@@ -54,11 +54,9 @@ namespace VPNWatcher
         // we have a whitelist, check against it before killing
         private static Boolean isAppOnWhitelist(String strApp)
         {
-            //Helper.doLog(scrollViewerLog, "isAppOnWhitelist " + strApp, m_configHandler.DebugMode, m_configHandler.ConsoleMaxSize);
-
             if (listWhilelist.Contains(strApp))
             {
-                //Helper.doLog(scrollViewerLog, "app " + strApp + " is on whitelist and connet be killed", true, m_configHandler.ConsoleMaxSize);
+                Helper.doLog("app " + strApp + " is on whitelist and connot be killed");
                 return true;
             }
 

@@ -84,5 +84,5 @@
             <CheckBox Content="Start minimized" Height="16" HorizontalAlignment="Left" Margin="5" Name="checkBoxMinimized" VerticalAlignment="Top" Checked="checkBoxMinimized_Checked" Unchecked="checkBoxMinimized_Unchecked" Grid.Row="5" Grid.Column="1" />
             <CheckBox Content="Strict Mode" Height="16" HorizontalAlignment="Left" Margin="5" x:Name="checkBoxStrict" VerticalAlignment="Top" Checked="checkBoxStrict_Checked" Unchecked="checkBoxStrict_Unchecked" Grid.Row="5" Grid.Column="1"/>
         </StackPanel>
-    </Grid>
+    </Grid> 
 </Window>
