@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VPNWatcher", "VPNW\VPNWatcher\VPNWatcher.csproj", "{62CB290E-E16F-458F-A0CF-7A4C44ADEF1B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VPNWatcher", "VPNWatcher\VPNWatcher.csproj", "{62CB290E-E16F-458F-A0CF-7A4C44ADEF1B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
