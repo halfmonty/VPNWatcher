@@ -150,7 +150,7 @@ namespace VPNWatcher
                 ConsoleMaxSize = 10000;
             }
 
-            nValue = getConfigInt("TimerInMilliseconds");
+            nValue = getConfigInt("TimerInMilliSeconds");
             if (nValue <= 0) {
                 nValue = 2000;
             }
