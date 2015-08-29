@@ -18,7 +18,7 @@ namespace VPNTorrent
             try {
                 m_config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
             } catch(ConfigurationErrorsException) {
-                Helper.doLog(m_viewForLogging, "error reading configfile, setting default values", true, ConsoleMaxSize);
+                Helper.doLog("error reading configfile, setting default values");
             }
         }
 
@@ -71,7 +71,7 @@ namespace VPNTorrent
 
 
             DebugMode = getConfigBoolean("DebugMode");
-            Helper.doLog(m_viewForLogging, "loadConfigValues start", DebugMode, ConsoleMaxSize);
+            Helper.doLog("loadConfigValues start", DebugMode);
 
             uTorrentControlEnabled = getConfigBoolean("uTorrentControlEnabled");
 
@@ -161,7 +161,7 @@ namespace VPNTorrent
 
             StrictInterfaceHandling = getConfigBoolean("StrictInterfaceHandling");
 
-            Helper.doLog(m_viewForLogging, "settings loaded", true, ConsoleMaxSize);
+            Helper.doLog("settings loaded");
         }
 
         private string getConfigString(string strKey) {
@@ -173,7 +173,7 @@ namespace VPNTorrent
                 }  
             }
 
-            Helper.doLog(m_viewForLogging, "getConfig: key=" + strKey + " value=" + strReturn, DebugMode, ConsoleMaxSize);
+            Helper.doLog("getConfig: key=" + strKey + " value=" + strReturn, DebugMode);
             return strReturn;
         }
 
@@ -182,10 +182,10 @@ namespace VPNTorrent
             try {
                 nReturn = Convert.ToInt32(m_config.AppSettings.Settings[strKey].Value);
             } catch (Exception) {
-                Helper.doLog(m_viewForLogging, "error parsing " + strKey, true, ConsoleMaxSize);
+                Helper.doLog("error parsing " + strKey);
             }
 
-            Helper.doLog(m_viewForLogging, "getConfigInt key=" + strKey + " value=" + nReturn, DebugMode, ConsoleMaxSize);
+            Helper.doLog("getConfigInt key=" + strKey + " value=" + nReturn, DebugMode);
             return nReturn;
         }
 
@@ -195,12 +195,12 @@ namespace VPNTorrent
                 m_config.AppSettings.Settings[strKey].Value.ToLower() == "true")  {
                 bReturn = true;
             }
-            Helper.doLog(m_viewForLogging, "getConfigBoolean " + strKey + "-" + bReturn, DebugMode, ConsoleMaxSize);
+            Helper.doLog("getConfigBoolean " + strKey + "-" + bReturn, DebugMode);
             return bReturn;
         }
 
         private void setConfig(String strKey, string strValue) {
-            Helper.doLog(m_viewForLogging, "setConfig " + strKey + "-" + strValue, DebugMode, ConsoleMaxSize);
+            Helper.doLog("setConfig " + strKey + "-" + strValue, DebugMode);
 
             m_config.AppSettings.Settings[strKey].Value = strValue;
         }
@@ -262,7 +262,7 @@ namespace VPNTorrent
             try {
                 m_config.Save(ConfigurationSaveMode.Full);
             } catch(ConfigurationErrorsException) {
-                Helper.doLog(m_viewForLogging, "error saving configfile", true, ConsoleMaxSize);
+                Helper.doLog("error saving configfile");
             }
         }
     }

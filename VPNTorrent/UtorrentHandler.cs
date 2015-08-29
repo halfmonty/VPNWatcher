@@ -43,7 +43,7 @@ namespace VPNTorrent
             {
                 foreach (var torrent in torrentsHandled)
                 {
-                    ///Helper.doLog(scrollViewerLog, "Starting Torrent " + torrent.Name, true, m_configHandler.ConsoleMaxSize);
+                    Helper.doLog("Starting Torrent " + torrent.Name);
                     torrent.Start();
                 }
                 torrentsHandled.Clear();
@@ -57,7 +57,7 @@ namespace VPNTorrent
             {
                 foreach (var torrent in torrentsHandled)
                 {
-                    //Helper.doLog(scrollViewerLog, "UnPausing Torrent " + torrent.Name, true, m_configHandler.ConsoleMaxSize);
+                    Helper.doLog("UnPausing Torrent " + torrent.Name);
                     torrent.Unpause();
                 }
                 torrentsHandled.Clear();
@@ -66,8 +66,7 @@ namespace VPNTorrent
 
         // pauses any running torrents and adds them to torrentsHandled list
         public static void PauseUtorrent()
-        {
-            //doLog("pauseUtorrent");            
+        {          
             if (IsUtorrentOpen())
             {
                 foreach (var torrent in client.Torrents)
@@ -79,7 +78,7 @@ namespace VPNTorrent
                     {
                         if (!torrentsHandled.Exists(x => x.Name == torrent.Name))
                         {
-                            //Helper.doLog(scrollViewerLog, "Pausing Torrent " + torrent.Name, true, m_configHandler.ConsoleMaxSize);
+                            Helper.doLog("Pausing Torrent ");
                             torrentsHandled.Add(torrent);
                             torrent.Pause();
                         }
@@ -91,7 +90,6 @@ namespace VPNTorrent
         // stops any running torrents and adds them to the torrentsHandled list
         public static void StopUtorrent()
         {
-            //doLog("stopUtorrent");
             if (IsUtorrentOpen())
             {
                 foreach (var torrent in client.Torrents)
@@ -103,7 +101,7 @@ namespace VPNTorrent
                     {
                         if (!torrentsHandled.Exists(x => x.Name == torrent.Name))
                         {
-                            //Helper.doLog(scrollViewerLog, "Stopping Torrent " + torrent.Name, true, m_configHandler.ConsoleMaxSize);
+                            Helper.doLog("Stopping Torrent " + torrent.Name);
                             torrentsHandled.Add(torrent);
                             torrent.Stop();
                         }

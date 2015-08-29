@@ -24,7 +24,7 @@ namespace VPNTorrent
             foreach (var application in _applicationsClosed)
             {
                 Process.Start(application);
-                //Helper.doLog(scrollViewerLog, "Re-launching " + application, true, m_configHandler.ConsoleMaxSize);
+                Helper.doLog("Re-launching " + application);
             }
             clearApplicationsList();
         }

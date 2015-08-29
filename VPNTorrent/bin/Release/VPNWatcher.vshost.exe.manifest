@@ -55,14 +55,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="VPNWatcher.exe" size="316928">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="VPNWatcher.exe" size="316416">
       <assemblyIdentity name="VPNWatcher" version="1.1.1.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>J6OQp8Ce0c/ty0jpc3MKKOYDf20=</dsig:DigestValue>
+        <dsig:DigestValue>QCesqJQxI0Daq5tYch2fxCrSwHU=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

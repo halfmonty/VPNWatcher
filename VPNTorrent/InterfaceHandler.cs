@@ -18,7 +18,7 @@ namespace VPNTorrent
         }
 
         public List<NetworkInterface> getActiveNetworkInterfaces() {
-            Helper.doLog(m_viewForLogging, "getNetworkInterfaces ", m_config.DebugMode, m_config.ConsoleMaxSize);
+            Helper.doLog("getNetworkInterfaces ", m_config.DebugMode);
 
             m_dicAdapters.Clear();
 
@@ -37,7 +37,7 @@ namespace VPNTorrent
                 if (adapter.OperationalStatus == OperationalStatus.Up &&
                     adapter.GetIPProperties() != null && adapter.Description != null && adapter.NetworkInterfaceType != NetworkInterfaceType.Loopback) {
                     //String strAdapter = adapter.Description + "#" + adapter.Id + "#" + adapterProperties.UnicastAddresses[0].Address;
-                    Helper.doLog(m_viewForLogging, "getNetworkInterfaces " + adapter.Id, m_config.DebugMode, m_config.ConsoleMaxSize);
+                    Helper.doLog("getNetworkInterfaces " + adapter.Id, m_config.DebugMode);
                     listInterfaces.Add(adapter);
                 }
             }
@@ -46,7 +46,7 @@ namespace VPNTorrent
         }
 
         public NetworkInterface getNetworkDetails(String strID) {
-            Helper.doLog(m_viewForLogging, "getNetworkDetails " + strID, m_config.DebugMode, m_config.ConsoleMaxSize);
+            Helper.doLog("getNetworkDetails " + strID, m_config.DebugMode);
 
             if (strID != null && m_dicAdapters.ContainsKey(strID)) {
                 return m_dicAdapters[strID];
@@ -61,18 +61,18 @@ namespace VPNTorrent
                 bReturn =  true;
             }
 
-            Helper.doLog(m_viewForLogging, "isNetworkConnected " + net.Id + " = " + bReturn, m_config.DebugMode, m_config.ConsoleMaxSize);
+            Helper.doLog("isNetworkConnected " + net.Id + " = " + bReturn, m_config.DebugMode);
 
             return bReturn;
         }
 
         public String findSelectedInterface(String strSelection) {
-            Helper.doLog(m_viewForLogging, "findSelectedInterface " + strSelection, m_config.DebugMode, m_config.ConsoleMaxSize);
+            Helper.doLog("findSelectedInterface " + strSelection, m_config.DebugMode );
 
             foreach (KeyValuePair<String, NetworkInterface> entry in m_dicAdapters) {
                 // do something with entry.Value or entry.Key
                 if (strSelection.StartsWith(entry.Value.Description)) {
-                    Helper.doLog(m_viewForLogging, "findSelectedInterface found " + entry.Key + " " + entry.Value.Description, m_config.DebugMode, m_config.ConsoleMaxSize);
+                    Helper.doLog("findSelectedInterface found " + entry.Key + " " + entry.Value.Description, m_config.DebugMode);
                     return entry.Key;
                 }
             }

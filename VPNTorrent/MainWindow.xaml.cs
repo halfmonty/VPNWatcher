@@ -24,8 +24,6 @@ namespace VPNTorrent
 
 //-------- Initialization -------//
 
-        
-
         NotifyIcon m_nIcon = null;
         DispatcherTimer m_dispatcherTimer = null;
 
@@ -47,6 +45,7 @@ namespace VPNTorrent
 
             m_configHandler = new ConfigHandler(scrollViewerLog);
             m_interfaceHandler = new InterfaceHandler(scrollViewerLog, m_configHandler);
+            Helper.view = scrollViewerLog;
 
             // read and display config values
             m_configHandler.loadConfigValues();
@@ -66,7 +65,7 @@ namespace VPNTorrent
         // displays the config values previously read to the frontend
         private void showConfigValues()
         {
-            Helper.doLog(scrollViewerLog, "showConfigValues", m_configHandler.DebugMode, m_configHandler.ConsoleMaxSize);
+            Helper.doLog("showConfigValues", m_configHandler.DebugMode);
             textBoxSelectedInterface.Text = m_configHandler.VPNInterfaceName;
             textBoxApps.Clear();
             foreach (String str in m_configHandler.getListApplications())
@@ -118,7 +117,7 @@ namespace VPNTorrent
         // callback function by the timer
         private void dispatcherTimer_Tick(object sender, EventArgs e)
         {
-            Helper.doLog(scrollViewerLog, "dispatcherTimer_Tick", m_configHandler.DebugMode, m_configHandler.ConsoleMaxSize);
+            Helper.doLog("dispatcherTimer_Tick", m_configHandler.DebugMode);
 
             try
             {
@@ -133,7 +132,7 @@ namespace VPNTorrent
             }
             catch (Exception excep)
             {
-                Helper.doLog(scrollViewerLog, "Exception\r\n" + Helper.FlattenException(excep), m_configHandler.DebugMode, m_configHandler.ConsoleMaxSize);
+                Helper.doLog("Exception\r\n" + Helper.FlattenException(excep), m_configHandler.DebugMode);
             }
         }
 
@@ -143,7 +142,7 @@ namespace VPNTorrent
             listNetworks = m_interfaceHandler.getActiveNetworkInterfaces();
             if (listBoxInterfaces.Items.Count != listNetworks.Count)
             {
-                Helper.doLog(scrollViewerLog, "network list changed, updating ...", true, m_configHandler.ConsoleMaxSize);
+                Helper.doLog("network list changed, updating ...");
                 showNetworkInterfaces(listNetworks);
             }
         }
@@ -151,7 +150,7 @@ namespace VPNTorrent
         // insert the connected networks into the listbox
         private void showNetworkInterfaces(List<NetworkInterface> listInterfaces)
         {
-            Helper.doLog(scrollViewerLog, "showNetworkInterfaces", m_configHandler.DebugMode, m_configHandler.ConsoleMaxSize);
+            Helper.doLog("showNetworkInterfaces", m_configHandler.DebugMode);
 
             listBoxInterfaces.Items.Clear();
             foreach (NetworkInterface i in listInterfaces)
@@ -168,7 +167,7 @@ namespace VPNTorrent
         // Check if VPN is connected
         private bool strictVPNCheck(NetworkInterface selectedNetworkInterface)
         {
-            Helper.doLog(scrollViewerLog, "dispatcherTimer_Tick strictmode VPN=" + m_configHandler.VPNInterfaceID + " select=" + selectedNetworkInterface, m_configHandler.DebugMode, m_configHandler.ConsoleMaxSize);
+            Helper.doLog("dispatcherTimer_Tick strictmode VPN=" + m_configHandler.VPNInterfaceID + " select=" + selectedNetworkInterface, m_configHandler.DebugMode);
             if (!String.IsNullOrWhiteSpace(m_configHandler.VPNInterfaceID) && selectedNetworkInterface != null && m_interfaceHandler.isNetworkConnected(selectedNetworkInterface)) {
                 performVpnConnectedApplicationAction();
                 iconAction(STATUS.VPN_CONNECTED);
@@ -231,7 +230,7 @@ namespace VPNTorrent
                 String[] arr = textBoxApps.Text.Trim().Split(Environment.NewLine.ToCharArray());
                 foreach (String str in arr) {
                     if (str.Trim() != "") {
-                        Helper.doLog(scrollViewerLog, "getApps " + str, m_configHandler.DebugMode, m_configHandler.ConsoleMaxSize);
+                        Helper.doLog("getApps " + str, m_configHandler.DebugMode);
                         listApps.Add(str.Trim());
                     }              
                 }
@@ -289,7 +288,7 @@ namespace VPNTorrent
                 }
                 else
                 {
-                    Helper.doLog(scrollViewerLog, "selected interface not found " + strID, true, m_configHandler.ConsoleMaxSize);
+                    Helper.doLog("selected interface not found " + strID);
                 }
             }
         }
@@ -347,7 +346,7 @@ namespace VPNTorrent
         private void onActionChange(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
             m_configHandler.ActionIndex = comboBoxAction.SelectedIndex;
-            Helper.doLog(scrollViewerLog, "saving combo box selection " + comboBoxAction.SelectedIndex, true, m_configHandler.ConsoleMaxSize);
+            Helper.doLog("saving combo box selection " + comboBoxAction.SelectedIndex);
             m_configHandler.saveValue(VPNTorrent.ConfigHandler.SETTING.CHOSEN_ACTION);
         }
 
@@ -364,7 +363,7 @@ namespace VPNTorrent
         private void utorrentEnabled_Checked(object sender, RoutedEventArgs e)
         {
             m_configHandler.uTorrentControlEnabled = true;
-            Helper.doLog(scrollViewerLog, "saving uTorrent Enabled " + comboBoxAction.SelectedIndex, true, m_configHandler.ConsoleMaxSize);
+            Helper.doLog("saving uTorrent Enabled " + comboBoxAction.SelectedIndex);
             m_configHandler.saveValue(ConfigHandler.SETTING.UTORRENT_ENABLED);
             iconUtorrentConnected(UtorrentHandler.SetupUtorrentConnection(m_configHandler));
         }
@@ -372,7 +371,7 @@ namespace VPNTorrent
         private void utorrentEnabled_Unchecked(object sender, RoutedEventArgs e)
         {
             m_configHandler.uTorrentControlEnabled = false;
-            Helper.doLog(scrollViewerLog, "saving uTorrent Disabled " + comboBoxAction.SelectedIndex, true, m_configHandler.ConsoleMaxSize);
+            Helper.doLog("saving uTorrent Disabled " + comboBoxAction.SelectedIndex);
             m_configHandler.saveValue(ConfigHandler.SETTING.UTORRENT_ENABLED);
             iconUtorrentConnected(null);
         }
@@ -474,7 +473,7 @@ namespace VPNTorrent
         // minimize the app to the trayicon
         private void doMinimize()
         {
-            Helper.doLog(scrollViewerLog, "doMinimize", m_configHandler.DebugMode, m_configHandler.ConsoleMaxSize);
+            Helper.doLog("doMinimize", m_configHandler.DebugMode);
 
             m_nIcon.Visible = true;
             Hide();
@@ -484,7 +483,7 @@ namespace VPNTorrent
         // maximize the app 
         private void doMaximize()
         {
-            Helper.doLog(scrollViewerLog, "doMaximize", m_configHandler.DebugMode, m_configHandler.ConsoleMaxSize);
+            Helper.doLog("doMaximize", m_configHandler.DebugMode);
 
             m_nIcon.Visible = false;
             Show();

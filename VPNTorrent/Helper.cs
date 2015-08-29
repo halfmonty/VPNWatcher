@@ -3,18 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows.Controls;
+using System.Configuration;
 
 namespace VPNTorrent
 {
     class Helper
     {
-        public static void doLog(ScrollViewer view, String text, Boolean bDoLog, int nConsoleMaxSize)
+        private static int ConsoleMaxSize = 10000;
+        public static ScrollViewer view;
+
+        public static void doLog(String text, Boolean bDoLog = true)
         {
             if (bDoLog == false) {
                 return;
             }
 
-            if (view.Content != null && view.ToString().Length > nConsoleMaxSize) {
+            if (view.Content != null && view.ToString().Length > ConsoleMaxSize) {
                 view.Content = "";
             }
 
