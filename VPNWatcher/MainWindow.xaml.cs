@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Windows;
 using System.Windows.Threading;
 using System.Windows.Forms;
@@ -89,7 +89,7 @@ namespace VPNWatcher
             m_nIcon = new NotifyIcon();
             m_nIcon.Icon = Properties.Resources.logo;
             m_nIcon.Visible = false;
-            m_nIcon.Text = "VPN Watcher"; //ddTODO: put into resource?
+            m_nIcon.Text = "VPN Watcher"; //TODO: put into resource?
 
             m_nIcon.DoubleClick += new System.EventHandler(notifyIcon_DoubleClick);
             m_nIcon.ContextMenu = new ContextMenu();
