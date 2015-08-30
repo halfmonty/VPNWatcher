@@ -42,7 +42,7 @@ It doesn't, the CPU usage is very small. If neccessary, open up the config file
 and increase the timespan between the checks (see "TimerInMilliSeconds" in the config).
 
 
-### I'm paranoid, I want it to check for a VPN loss every millisecond!
+### I'm paranoid, I want to check for a VPN loss every millisecond!
 
 You can do so by setting TimerInMilliSeconds to 1 in the config, which is the minimun.
 
@@ -73,17 +73,13 @@ One line per application.
 
 ### How can I pause/stop torrents when the VPN drops?
 
-For this to work, you need to enable the Web UI in uTorrent (Options, Preferences, Advanced, Web UI).
+For this to work, you need to enable the Web UI in uTorrent (Options, Preferences, Advanced, Web UI). Choose a 
+Username, Password and Alternative listening port.
 
-Choose a Username, Password and Alternative listening port.
-
-In VPNWatcher, check the uTorrent checkbox.
-
-Address: http://localhost:YOUR-CONFIGURED-PORT/gui
-
-Username: your configured username
-
-Password: your configured username
+In VPNWatcher, check the uTorrent checkbox and insert the data you just configued in utorrent:
+- Address: http://localhost:YOUR-CONFIGURED-PORT/gui
+- Username: your configured username
+- Password: your configured username
 
 A green check shows up when your credentials are working, now you can select whether you
 want torrents paused or stopped upon vpn loss.
@@ -92,7 +88,7 @@ want torrents paused or stopped upon vpn loss.
 
 ### When VPNWatcher is started minimized, how do I open it up again?
 
-Whenever VPNWatcher is minimzed, a trayicon will show. Either doubleclick on it or
+Whenever VPNWatcher is minimzed, a trayicon will show up. Either doubleclick on it or
 rightclick and hit "Open".
 
 
@@ -114,7 +110,7 @@ If you manually want to edit it, close VPNWatcher and use any text editor you li
              into the clipboard when you exit the application (so you can easily send me logs in case
              you need help).
 - StrictInterfaceHandling: **TODO DESCRIBE IT**
-**TODO utorrent stuff**
+- **TODO utorrent stuff**
 
 
 
@@ -155,6 +151,7 @@ Changelog
   - restore a closed app upon vpn reconnect
   - utorrent Web UI support to pause/stop torrents
   - autostart by checkbox
+  - sourcecode cleanup
   - **TODO ???**
    
 ### 1.1 - 120613
