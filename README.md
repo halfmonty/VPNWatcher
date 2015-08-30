@@ -136,7 +136,7 @@ uTorrentAPI for .NET - https://utorrentapi.codeplex.com/
 ### I have additonal ideas or questions, can I contact you?
 
 Sure, there are currently two developers playing around with VPNWatcher.
-Mike is currently reachable via mikehubley -A-T- @ gmail -D-O-T- com, Freddi at muff99 -A-T- outlook -D-O-T- com
+Mike is currently reachable via halfmonty11 -A-T- @ gmail -D-O-T- com, Freddi at muff99 -A-T- outlook -D-O-T- com
 
 
 
