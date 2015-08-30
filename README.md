@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 VPNWatcher
 ---------------------
 
@@ -167,4 +166,3 @@ Changelog
 ### 1.0 - 100613
 
   - initial release
->>>>>>> 91e52318bb548b373ccb0f6ddaed14d5edb7d4a3
