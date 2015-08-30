@@ -1,7 +1,7 @@
 VPNWatcher
 ---------------------
 
-VPNWatcher is a small tool to make sure that certain programs only
+VPNWatcher is a small tool to make sure that configured programs only
 run when you are connected do a VPN. It's designed to quietly run in the background
 and only jump into action when you lose your VPN connection.
 
@@ -113,7 +113,8 @@ If you manually want to edit it, close VPNWatcher and use any text editor you li
 - DebugMode: If set to "true", spams massive logs into the Log textbox and also copies everything
              into the clipboard when you exit the application (so you can easily send me logs in case
              you need help).
-**TODO utorrent stuff **
+- StrictInterfaceHandling: **TODO DESCRIBE IT**
+**TODO utorrent stuff**
 
 
 
@@ -131,6 +132,10 @@ Sure, its on Github: https://github.com/halfmonty/VPNWatcher
 Feel free to fork and submit pull requests.
 
 
+### What external libraries are you using?
+uTorrentAPI for .NET - https://utorrentapi.codeplex.com/
+
+
 
 ### I have additonal ideas or questions, can I contact you?
 
@@ -144,30 +149,23 @@ Mike is currently reachable via mikehubley -A-T- @ gmail -D-O-T- com, Freddi at 
 Changelog
 ---------------------
 
-* 1.X - ddmm15
+### 1.X - ddmm15
 
-  configure the timer in milliseconds instead of seconds
-  
-  restore a closed app upon vpn reconnect
-  
-  utorrent Web UI support to pause/stop torrents
-  
-  autostart by checkbox
-  
-  **TODO ??? **
+  - configure the timer in milliseconds instead of seconds
+  - restore a closed app upon vpn reconnect
+  - utorrent Web UI support to pause/stop torrents
+  - autostart by checkbox
+  - **TODO ???**
    
-* 1.1 - 120613
-  support for interfaces instead of IP ranges (big thanks to TorrentFreak's Ernesto)
-  
-  fix for VPNWatcher doing nothing when started minimized
-  
-  simpler UI with less buttons
-  
-  autosave for all config values except the interface name
-  
-  icons fixed (less resources, smaller binary) 
-  
-  sourcecode cleanup
+### 1.1 - 120613
 
-* 1.0 - 100613
-  initial release
+  - support for interfaces instead of IP ranges (big thanks to TorrentFreak's Ernesto)
+  - fix for VPNWatcher doing nothing when started minimized
+  - simpler UI with less buttons
+  - autosave for all config values except the interface name
+  - icons fixed (less resources, smaller binary) 
+  - sourcecode cleanup
+
+### 1.0 - 100613
+
+  - initial release
