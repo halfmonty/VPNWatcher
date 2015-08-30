@@ -38,8 +38,8 @@ It's a C# WPF project and requires the .NET Framework 4.0 to run.
 
 ### I'm afraid it uses too much resources, can I reduce this somehow?
 
-It doesn't, the CPU usage is very small. If neccessary, open up the config file
-and increase the timespan between the checks (see "TimerInMilliSeconds" in the config).
+It doesn't, the CPU usage is very small. If necessary you can adjust the timer
+slider at the bottom of the window to slow the frequency that it checks for changes.
 
 
 ### I'm paranoid, I want to check for a VPN loss every millisecond!
@@ -145,14 +145,14 @@ Mike is currently reachable via halfmonty11 -A-T- @ gmail -D-O-T- com, Freddi at
 Changelog
 ---------------------
 
-### 1.X - ddmm15
+### 1.2 - ddmm15
 
   - configure the timer in milliseconds instead of seconds
   - restore a closed app upon vpn reconnect
   - utorrent Web UI support to pause/stop torrents
   - autostart by checkbox
   - sourcecode cleanup
-  - **TODO ???**
+  - slider to change update frequency in UI
    
 ### 1.1 - 120613
 

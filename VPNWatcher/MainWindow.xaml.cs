@@ -87,6 +87,7 @@ namespace VPNWatcher
             textBoxUtorrentUsername.Text = m_configHandler.uTorrentUsername;
             textBoxUtorrentPassword.Password = m_configHandler.uTorrentPassword;
             RadioButtonPause.IsChecked = !m_configHandler.uTorrentStop;
+            updateInterval.Value = ((double)m_configHandler.TimerInMilliseconds / 1000);
         }
 
         // the minimize-to-tray feature
@@ -111,11 +112,7 @@ namespace VPNWatcher
         private void setupTimer() {
             m_dispatcherTimer = new DispatcherTimer();
             m_dispatcherTimer.Tick += new EventHandler(dispatcherTimer_Tick);
-<<<<<<< HEAD
-            m_dispatcherTimer.Interval = new TimeSpan(0, 0, m_configHandler.TimerInMilliseconds);
-=======
-            m_dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, m_configHandler.TimerInMilliSeconds);
->>>>>>> origin/master
+            m_dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, m_configHandler.TimerInMilliseconds);
             m_dispatcherTimer.Start();
         }
         
@@ -127,7 +124,7 @@ namespace VPNWatcher
         private void dispatcherTimer_Tick(object sender, EventArgs e)
         {
             watch.Start();
-            Helper.doLog("dispatcherTimer_Tick");//, m_configHandler.DebugMode);
+            Helper.doLog("dispatcherTimer_Tick", m_configHandler.DebugMode);
 
             try
             {
@@ -147,7 +144,7 @@ namespace VPNWatcher
                 Helper.doLog("Exception\r\n" + Helper.FlattenException(excep), m_configHandler.DebugMode);
             }
 
-            Helper.doLog(""+watch.ElapsedMilliseconds);
+            Helper.doLog("" + watch.ElapsedMilliseconds, m_configHandler.DebugMode);
             watch.Stop();
             watch.Reset();            
         }
@@ -443,6 +440,17 @@ namespace VPNWatcher
             }
             m_configHandler.uTorrentStop = (bool)RadioButtonStop.IsChecked;
             m_configHandler.saveValue(VPNWatcher.ConfigHandler.SETTING.UTORRENT_STOP);
+        }
+
+        private void updateInterval_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (!m_bIsInitCompleted)
+            {
+                return;
+            }
+            m_configHandler.TimerInMilliseconds = (int)(updateInterval.Value * 1000);
+            m_configHandler.saveValue(VPNWatcher.ConfigHandler.SETTING.TIMER);
+            m_dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, m_configHandler.TimerInMilliseconds);
         }
 
 

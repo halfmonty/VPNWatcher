@@ -10,6 +10,7 @@
             <RowDefinition Height="3*"/>
             <RowDefinition Height="3*"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="70"/>
@@ -84,5 +85,9 @@
             <CheckBox Content="Start minimized" Height="16" HorizontalAlignment="Left" Margin="5" Name="checkBoxMinimized" VerticalAlignment="Top" Checked="checkBoxMinimized_Checked" Unchecked="checkBoxMinimized_Unchecked" Grid.Row="5" Grid.Column="1" />
             <CheckBox Content="Strict Mode" Height="16" HorizontalAlignment="Left" Margin="5" x:Name="checkBoxStrict" VerticalAlignment="Top" Checked="checkBoxStrict_Checked" Unchecked="checkBoxStrict_Unchecked" Grid.Row="5" Grid.Column="1"/>
         </StackPanel>
+        
+        <Label Content="Timer" HorizontalAlignment="Right" Grid.Row="6"/>
+        <Slider Name="updateInterval" Margin="5" Grid.Row="6" Grid.Column="1" Minimum="0.1" ValueChanged="updateInterval_ValueChanged" />
+        <Label Content="{Binding ElementName=updateInterval, Path=Value}" ContentStringFormat="{}{0:N1}" Grid.Row="6" Grid.Column="2"/>
     </Grid> 
 </Window>

@@ -26,11 +26,7 @@ namespace VPNWatcher
         public int ConsoleMaxSize { get; set; }
         public Boolean IgnoreIPV6 { get; set; }
         public Boolean StartMinimized { get; set; }
-<<<<<<< HEAD
         public int TimerInMilliseconds { get; set; }
-=======
-        public int TimerInMilliSeconds { get; set; }
->>>>>>> origin/master
         public Boolean DebugMode { get; set; }
         public int ActionIndex { get; set; }
         public String VPNInterfaceID { get; set; }
@@ -64,7 +60,8 @@ namespace VPNWatcher
             UTORRENT_STOP,
             APPLICATIONS,
             STRICT,
-            CHOSEN_ACTION
+            CHOSEN_ACTION,
+            TIMER
         };
 
         //load all the config falues
@@ -154,19 +151,11 @@ namespace VPNWatcher
                 ConsoleMaxSize = 10000;
             }
 
-<<<<<<< HEAD
             nValue = getConfigInt("TimerInMilliseconds");
-=======
-            nValue = getConfigInt("TimerInMilliSeconds");
->>>>>>> origin/master
             if (nValue <= 0) {
                 nValue = 2000;
             }
-<<<<<<< HEAD
             TimerInMilliseconds = nValue;
-=======
-            TimerInMilliSeconds = nValue;
->>>>>>> origin/master
 
             //bIgnoreIPV6 = getConfigBoolean("IgnoreIPV6");
             StartMinimized = getConfigBoolean("StartMinimized");
@@ -265,6 +254,10 @@ namespace VPNWatcher
                     break;
                 case SETTING.UTORRENT_STOP:
                     setConfig("uTorrentStop", uTorrentStop.ToString().ToLower());
+                    saveConfigfile();
+                    break;
+                case SETTING.TIMER:
+                    setConfig("TimerInMilliSeconds", TimerInMilliseconds.ToString().ToLower());
                     saveConfigfile();
                     break;
                 }
