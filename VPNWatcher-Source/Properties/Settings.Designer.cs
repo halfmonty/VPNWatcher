@@ -217,8 +217,7 @@ namespace VPNWatcher.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("https://api.github.com/repos/halfmonty/VPNWatcher/git/blobs/b77e78f61eef4f104d4ec" +
-            "c47c3822d09148d5d6c")]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://api.github.com/repos/halfmonty/VPNWatcher/contents/VPNWatcher-Program")]
         public string GithubUrl {
             get {
                 return ((string)(this["GithubUrl"]));

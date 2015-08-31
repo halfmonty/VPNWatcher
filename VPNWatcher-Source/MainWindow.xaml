@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:p="clr-namespace:VPNWatcher.Properties"
         xmlns:local="clr-namespace:VPNWatcher"
-        Title="VPN Watcher 1.2" Height="497" Width="488" MinHeight="497" MinWidth="488" BorderThickness="1" Closed="onExit" Icon="./Resources/logo.ico" StateChanged="onStateChanged" Closing="Window_Closing" Loaded="Window_Loaded">
+        Title="VPN Watcher 1.2" Height="497" Width="488" MinHeight="497" MinWidth="488" BorderThickness="1" Closed="onExit" Icon="./Resources/logo.ico" StateChanged="onStateChanged" Closing="Window_Closing">
     <Window.Resources>
         <local:MillisecondsToSecondsConverter x:Key="converter" />
         <local:ApplicationListConverter x:Key="AppConverter" />
