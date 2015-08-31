@@ -10,15 +10,13 @@ namespace VPNWatcher
         Dictionary<String, NetworkInterface> m_dicAdapters = new Dictionary<String, NetworkInterface>();
 
         ScrollViewer m_viewForLogging = null;
-        ConfigHandler m_config = null;
 
-        public InterfaceHandler(ScrollViewer viewForLogging, ConfigHandler config) {
+        public InterfaceHandler(ScrollViewer viewForLogging) {
             m_viewForLogging = viewForLogging;
-            m_config = config;
         }
 
         public List<NetworkInterface> getActiveNetworkInterfaces() {
-            Helper.doLog("getNetworkInterfaces ", m_config.DebugMode);
+            Helper.doLog("getNetworkInterfaces ", Properties.Settings.Default.DebugMode);
 
             m_dicAdapters.Clear();
 
@@ -37,7 +35,7 @@ namespace VPNWatcher
                 if (adapter.OperationalStatus == OperationalStatus.Up &&
                     adapter.GetIPProperties() != null && adapter.Description != null && adapter.NetworkInterfaceType != NetworkInterfaceType.Loopback) {
                     //String strAdapter = adapter.Description + "#" + adapter.Id + "#" + adapterProperties.UnicastAddresses[0].Address;
-                    Helper.doLog("getNetworkInterfaces " + adapter.Id, m_config.DebugMode);
+                        Helper.doLog("getNetworkInterfaces " + adapter.Id, Properties.Settings.Default.DebugMode);
                     listInterfaces.Add(adapter);
                 }
             }
@@ -46,7 +44,7 @@ namespace VPNWatcher
         }
 
         public NetworkInterface getNetworkDetails(String strID) {
-            Helper.doLog("getNetworkDetails " + strID, m_config.DebugMode);
+            Helper.doLog("getNetworkDetails " + strID, Properties.Settings.Default.DebugMode);
 
             if (strID != null && m_dicAdapters.ContainsKey(strID)) {
                 return m_dicAdapters[strID];
@@ -61,18 +59,18 @@ namespace VPNWatcher
                 bReturn =  true;
             }
 
-            Helper.doLog("isNetworkConnected " + net.Id + " = " + bReturn, m_config.DebugMode);
+            Helper.doLog("isNetworkConnected " + net.Id + " = " + bReturn, Properties.Settings.Default.DebugMode);
 
             return bReturn;
         }
 
         public String findSelectedInterface(String strSelection) {
-            Helper.doLog("findSelectedInterface " + strSelection, m_config.DebugMode );
+            Helper.doLog("findSelectedInterface " + strSelection, Properties.Settings.Default.DebugMode);
 
             foreach (KeyValuePair<String, NetworkInterface> entry in m_dicAdapters) {
                 // do something with entry.Value or entry.Key
                 if (strSelection.StartsWith(entry.Value.Description)) {
-                    Helper.doLog("findSelectedInterface found " + entry.Key + " " + entry.Value.Description, m_config.DebugMode);
+                    Helper.doLog("findSelectedInterface found " + entry.Key + " " + entry.Value.Description, Properties.Settings.Default.DebugMode);
                     return entry.Key;
                 }
             }

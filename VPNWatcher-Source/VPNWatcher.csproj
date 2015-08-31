@@ -105,10 +105,14 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Helper.cs" />
-    <Compile Include="ConfigHandler.cs" />
     <Compile Include="InterfaceHandler.cs" />
     <Compile Include="ProcessHandler.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
     <Compile Include="Settings.cs" />
     <Compile Include="ShortcutHandler.cs" />
     <Compile Include="UtorrentHandler.cs" />
@@ -145,6 +149,10 @@
       <SubType>Designer</SubType>
     </None>
     <AppDesigner Include="Properties\" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
     <None Include="VPNTorrent_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
