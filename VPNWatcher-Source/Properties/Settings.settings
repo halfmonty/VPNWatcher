@@ -51,7 +51,7 @@
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="GithubUrl" Type="System.String" Scope="User">
-      <Value Profile="(Default)">https://api.github.com/repos/halfmonty/VPNWatcher/git/blobs/b77e78f61eef4f104d4ecc47c3822d09148d5d6c</Value>
+      <Value Profile="(Default)">https://api.github.com/repos/halfmonty/VPNWatcher/contents/VPNWatcher-Program</Value>
     </Setting>
   </Settings>
 </SettingsFile>

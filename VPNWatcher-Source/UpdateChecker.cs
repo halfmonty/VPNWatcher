@@ -20,10 +20,10 @@ namespace VPNWatcher
             {
                 Helper.doLog("isonline = true, checking github", Properties.Settings.Default.DebugMode);
                 var json = new JavaScriptSerializer();
-                var data = json.Deserialize<Dictionary<string, dynamic>>(getDataStringFromGithub());
-                Helper.doLog(data["size"] + "", Properties.Settings.Default.DebugMode);
+                var data = json.Deserialize<List<Dictionary<string, dynamic>>>(getDataStringFromGithub());
+                Helper.doLog(data[0]["size"] + "", Properties.Settings.Default.DebugMode);
 
-                if (data["size"] != getFileSize())
+                if (data[0]["size"] != getFileSize())
                 {
                     updateLable.Content = "Update";
                     updateLable.ToolTip = "A new update is available on github.com/halfmonty/VPNwatcher";
