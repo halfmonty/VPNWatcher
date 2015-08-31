@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:p="clr-namespace:VPNWatcher.Properties"
         xmlns:local="clr-namespace:VPNWatcher"
-        Title="VPN Watcher 1.1" Height="497" Width="488" MinHeight="497" MinWidth="488" BorderThickness="1" Closed="onExit" Icon="./Resources/logo.ico" StateChanged="onStateChanged" Closing="Window_Closing">
+        Title="VPN Watcher 1.2" Height="497" Width="488" MinHeight="497" MinWidth="488" BorderThickness="1" Closed="onExit" Icon="./Resources/logo.ico" StateChanged="onStateChanged" Closing="Window_Closing" Loaded="Window_Loaded">
     <Window.Resources>
         <local:MillisecondsToSecondsConverter x:Key="converter" />
         <local:ApplicationListConverter x:Key="AppConverter" />
@@ -88,7 +88,8 @@
             </StackPanel>
         </Grid>
 
-        <Image Height="23" HorizontalAlignment="Left" Margin="5,5,5,5" Name="imageUtorrentStatus" VerticalAlignment="Center" Stretch="Fill" Width="28" Grid.Row="2" Grid.Column="2" />
+        <Image Height="23" HorizontalAlignment="Left" Margin="5,5,5,5" Name="imageUtorrentStatus" 
+               VerticalAlignment="Center" Stretch="Fill" Width="28" Grid.Row="2" Grid.Column="2" />
 
         <Label Content="Apps" HorizontalAlignment="Right" Margin="0" Name="label1" VerticalAlignment="Top" Width="40" Grid.Row="3" Grid.Column="0" />
         <TextBox AcceptsReturn="True" HorizontalAlignment="Stretch" Margin="5,5,120,5" 
@@ -105,7 +106,9 @@
 
         <Label Content="Log" Height="28" HorizontalAlignment="Right" Margin="0" Name="labelLog" VerticalAlignment="Top" Grid.Row="5" Grid.Column="0"/>
         <ScrollViewer HorizontalAlignment="Stretch" Margin="5" Name="scrollViewerLog" VerticalAlignment="Stretch" BorderThickness="4" BorderBrush="Black" IsManipulationEnabled="False" HorizontalScrollBarVisibility="Visible" Grid.Row="5" Grid.Column="1" />
-
+        
+        <Label Name="updateNotifier" Content="" VerticalAlignment="Top" HorizontalAlignment="Center" Foreground="Red" Grid.Row="6" Grid.Column="0"/>
+        
         <StackPanel Orientation="Horizontal" Grid.Row="6" Grid.Column="1" HorizontalAlignment="Center">
             <CheckBox Content="Start with Windows" Height="16" HorizontalAlignment="Left" Margin="5" x:Name="checkBoxStartup" VerticalAlignment="Top" Checked="checkBoxStartup_Checked" Unchecked="checkBoxStartup_Unchecked" Grid.Row="6" Grid.Column="1" />
             <CheckBox Content="Start minimized" Height="16" HorizontalAlignment="Left" Margin="5" 

@@ -43,6 +43,14 @@ namespace VPNWatcher
         public MainWindow() {
             InitializeComponent();
             init();
+            UpdateChecker.checkForNewerVersion(updateNotifier);
+
+            // temporary workaround... will come up with something better
+            if (Properties.Settings.Default.uTorrentControlEnabled)
+            {
+                UtorrentHandler.SetupUtorrentConnection();
+            }
+
         }
 
         // initialize all custom variables
