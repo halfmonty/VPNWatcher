@@ -38,15 +38,15 @@ namespace VPNWatcher
         }
 
         // setup uTorrent Client and validate connection
-        public static bool SetupUtorrentConnection(ConfigHandler _configHandler)
+        public static bool SetupUtorrentConnection()
         {
-            uTorrentUrl = _configHandler.uTorrentUrl;
+            uTorrentUrl = Properties.Settings.Default.uTorrentUrl;
 
             if (!String.IsNullOrWhiteSpace(uTorrentUrl) &&
-                !String.IsNullOrWhiteSpace(_configHandler.uTorrentUsername) &&
-                !String.IsNullOrWhiteSpace(_configHandler.uTorrentPassword))
+                !String.IsNullOrWhiteSpace(Properties.Settings.Default.uTorrentUsername) &&
+                !String.IsNullOrWhiteSpace(Properties.Settings.Default.uTorrentPassword))
             {
-                client = new UTorrentClient(new System.Uri(uTorrentUrl), _configHandler.uTorrentUsername, _configHandler.uTorrentPassword);
+                client = new UTorrentClient(new System.Uri(uTorrentUrl), Properties.Settings.Default.uTorrentUsername, Properties.Settings.Default.uTorrentPassword);
                 ConnectToUtorrent();
                 return IsUtorrentConnected;
             }

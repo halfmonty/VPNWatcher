@@ -28,7 +28,6 @@ namespace VPNWatcher
         NotifyIcon m_nIcon = null;
         DispatcherTimer m_dispatcherTimer = null;
 
-        public ConfigHandler m_configHandler = null;
         InterfaceHandler m_interfaceHandler = null;
         List<NetworkInterface> listNetworks;
         NetworkInterface selectedNetworkInterface;
@@ -49,45 +48,18 @@ namespace VPNWatcher
         // initialize all custom variables
         private void init()
         {
-            m_configHandler = new ConfigHandler(scrollViewerLog);
-            m_interfaceHandler = new InterfaceHandler(scrollViewerLog, m_configHandler);
+            m_interfaceHandler = new InterfaceHandler(scrollViewerLog);
             Helper.view = scrollViewerLog;
             UtorrentHandler.statusIcon = imageUtorrentStatus;
-
-            // read and display config values
-            m_configHandler.loadConfigValues();
-            showConfigValues();
-
+            checkBoxStartup.IsChecked = ShortcutHandler.isInStartup();
+            
             setupTimer();
             setupNotifyIcon();
 
-            if (m_configHandler.StartMinimized)
+            if (Properties.Settings.Default.StartMinimized)
                 doMinimize();
 
             m_bIsInitCompleted = true;
-        }
-
-        // displays the config values previously read to the frontend
-        private void showConfigValues()
-        {
-            Helper.doLog("showConfigValues", m_configHandler.DebugMode);
-            textBoxSelectedInterface.Text = m_configHandler.VPNInterfaceName;
-            textBoxApps.Clear();
-            foreach (String str in m_configHandler.getListApplications())
-            {
-                textBoxApps.Text += str + Environment.NewLine;
-            }
-            textBoxApps.Text = textBoxApps.Text.Trim();
-            checkBoxMinimized.IsChecked = m_configHandler.StartMinimized;
-            checkBoxStrict.IsChecked = m_configHandler.StrictInterfaceHandling;
-            comboBoxAction.SelectedIndex = m_configHandler.ActionIndex;
-            checkBoxStartup.IsChecked = ShortcutHandler.isInStartup();
-            CheckBoxUtorrentEnabled.IsChecked = m_configHandler.uTorrentControlEnabled;
-            textBoxUtorrentUrl.Text = m_configHandler.uTorrentUrl;
-            textBoxUtorrentUsername.Text = m_configHandler.uTorrentUsername;
-            textBoxUtorrentPassword.Password = m_configHandler.uTorrentPassword;
-            RadioButtonPause.IsChecked = !m_configHandler.uTorrentStop;
-            updateInterval.Value = ((double)m_configHandler.TimerInMilliseconds / 1000);
         }
 
         // the minimize-to-tray feature
@@ -112,7 +84,7 @@ namespace VPNWatcher
         private void setupTimer() {
             m_dispatcherTimer = new DispatcherTimer();
             m_dispatcherTimer.Tick += new EventHandler(dispatcherTimer_Tick);
-            m_dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, m_configHandler.TimerInMilliseconds);
+            m_dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 2000);
             m_dispatcherTimer.Start();
         }
         
@@ -124,15 +96,15 @@ namespace VPNWatcher
         private void dispatcherTimer_Tick(object sender, EventArgs e)
         {
             watch.Start();
-            Helper.doLog("dispatcherTimer_Tick", m_configHandler.DebugMode);
+            Helper.doLog("dispatcherTimer_Tick", Properties.Settings.Default.DebugMode);
 
             try
             {
                 updateNetworkInterfaces();
-                selectedNetworkInterface = m_interfaceHandler.getNetworkDetails(m_configHandler.VPNInterfaceID);
+                selectedNetworkInterface = m_interfaceHandler.getNetworkDetails(Properties.Settings.Default.VPNInterfaceID);
                 bool? status = null;
 
-                if (m_configHandler.StrictInterfaceHandling) {
+                if (Properties.Settings.Default.StrictInterfaceHandling) {
                     status = strictVPNCheck(selectedNetworkInterface);
                 } else {
                     status = regularVPNCheck(selectedNetworkInterface);
@@ -141,10 +113,10 @@ namespace VPNWatcher
             }
             catch (Exception excep)
             {
-                Helper.doLog("Exception\r\n" + Helper.FlattenException(excep), m_configHandler.DebugMode);
+                Helper.doLog("Exception\r\n" + Helper.FlattenException(excep), Properties.Settings.Default.DebugMode);
             }
 
-            Helper.doLog("" + watch.ElapsedMilliseconds, m_configHandler.DebugMode);
+            Helper.doLog("" + watch.ElapsedMilliseconds, Properties.Settings.Default.DebugMode);
             watch.Stop();
             watch.Reset();            
         }
@@ -163,7 +135,7 @@ namespace VPNWatcher
         // insert the connected networks into the listbox
         private void showNetworkInterfaces(List<NetworkInterface> listInterfaces)
         {
-            Helper.doLog("showNetworkInterfaces", m_configHandler.DebugMode);
+            Helper.doLog("showNetworkInterfaces", Properties.Settings.Default.DebugMode);
 
             listBoxInterfaces.Items.Clear();
             foreach (NetworkInterface i in listInterfaces)
@@ -180,8 +152,9 @@ namespace VPNWatcher
         // Check if VPN is connected
         private bool strictVPNCheck(NetworkInterface selectedNetworkInterface)
         {
-            Helper.doLog("dispatcherTimer_Tick strictmode VPN=" + m_configHandler.VPNInterfaceID + " select=" + selectedNetworkInterface, m_configHandler.DebugMode);
-            if (!String.IsNullOrWhiteSpace(m_configHandler.VPNInterfaceID) && selectedNetworkInterface != null && m_interfaceHandler.isNetworkConnected(selectedNetworkInterface)) {
+            Helper.doLog("dispatcherTimer_Tick strictmode VPN=" + Properties.Settings.Default.VPNInterfaceID + " select=" + selectedNetworkInterface, Properties.Settings.Default.DebugMode);
+            if (!String.IsNullOrWhiteSpace(Properties.Settings.Default.VPNInterfaceID) && selectedNetworkInterface != null && m_interfaceHandler.isNetworkConnected(selectedNetworkInterface))
+            {
                 performVpnConnectedApplicationAction();
                 iconAction(STATUS.VPN_CONNECTED);
                 return true;
@@ -208,8 +181,9 @@ namespace VPNWatcher
         private void performApplicationAction() {
             ProcessHandler.closeApps(getApps());
 
-            if (UtorrentHandler.IsUtorrentConnected && m_configHandler.uTorrentControlEnabled) {
-                if (m_configHandler.uTorrentStop) {
+            if (UtorrentHandler.IsUtorrentConnected && Properties.Settings.Default.uTorrentControlEnabled) {
+                if (Properties.Settings.Default.uTorrentStop)
+                {
                     UtorrentHandler.StopUtorrent();
                 } else {
                     UtorrentHandler.PauseUtorrent();
@@ -221,14 +195,16 @@ namespace VPNWatcher
         private void performVpnConnectedApplicationAction()
         {
             //Helper.doLog(scrollViewerLog, "performApplicationAction " + nSelection, m_configHandler.DebugMode, m_configHandler.ConsoleMaxSize);
-            if (m_configHandler.ActionIndex == 0){
+            if (Properties.Settings.Default.ChosenActionIndex == 0){
                 ProcessHandler.clearApplicationsList();
             } else {
                 ProcessHandler.openApps();
             }
 
-            if (UtorrentHandler.IsUtorrentConnected && m_configHandler.uTorrentControlEnabled) {
-                if (m_configHandler.uTorrentStop) {
+            if (UtorrentHandler.IsUtorrentConnected && Properties.Settings.Default.uTorrentControlEnabled)
+            {
+                if (Properties.Settings.Default.uTorrentStop)
+                {
                     UtorrentHandler.StartUtorrent();
                 } else {
                     UtorrentHandler.UnpauseUtorrent();
@@ -245,7 +221,7 @@ namespace VPNWatcher
                 String[] arr = textBoxApps.Text.Trim().Split(Environment.NewLine.ToCharArray());
                 foreach (String str in arr) {
                     if (str.Trim() != "") {
-                        Helper.doLog("getApps " + str, m_configHandler.DebugMode);
+                        Helper.doLog("getApps " + str, Properties.Settings.Default.DebugMode);
                         listApps.Add(str.Trim());
                     }              
                 }
@@ -296,73 +272,15 @@ namespace VPNWatcher
                 String strID = m_interfaceHandler.findSelectedInterface(objSelected.ToString());
                 if (strID != null)
                 {
-                    m_configHandler.VPNInterfaceID = strID;
+                    Properties.Settings.Default.VPNInterfaceID = strID;
                     textBoxSelectedInterface.Text = m_interfaceHandler.getNetworkDetails(strID).Description;
-                    m_configHandler.VPNInterfaceName = textBoxSelectedInterface.Text;
-                    m_configHandler.saveValue(VPNWatcher.ConfigHandler.SETTING.VPN_ID_AND_NAME);
+                    Properties.Settings.Default.VPNInterfaceName = textBoxSelectedInterface.Text;
                 }
                 else
                 {
                     Helper.doLog("selected interface not found " + strID);
                 }
             }
-        }
-
-        private void checkBoxMinimized_Checked(object sender, RoutedEventArgs e)
-        {
-            m_configHandler.StartMinimized = true;
-            m_configHandler.saveValue(ConfigHandler.SETTING.START_MINIMIZED);
-        }
-
-        private void checkBoxMinimized_Unchecked(object sender, RoutedEventArgs e)
-        {
-            m_configHandler.StartMinimized = false;
-            m_configHandler.saveValue(ConfigHandler.SETTING.START_MINIMIZED);
-        }
-
-        private void checkBoxStrict_Checked(object sender, RoutedEventArgs e)
-        {
-            m_configHandler.StrictInterfaceHandling = true;
-            m_configHandler.saveValue(ConfigHandler.SETTING.STRICT);
-        }
-
-        private void checkBoxStrict_Unchecked(object sender, RoutedEventArgs e)
-        {
-            m_configHandler.StrictInterfaceHandling = false;
-            m_configHandler.saveValue(ConfigHandler.SETTING.STRICT);
-        }
-
-        //this should be replaced by C# data binding
-        private void onAppsChange(object sender, System.Windows.Controls.TextChangedEventArgs e)
-        {
-
-            if (!m_bIsInitCompleted)
-            {
-                return;
-            }
-            List<String> listApps = new List<String>();
-
-            String strTmp;
-            int nZeilen = textBoxApps.LineCount;
-            for (int i = 0; i < nZeilen; i++)
-            {
-                strTmp = textBoxApps.GetLineText(i).Trim();
-                if (strTmp.Length > 4)
-                {
-                    listApps.Add(strTmp);
-                }
-            }
-
-            m_configHandler.setListApplications(listApps);
-            m_configHandler.saveValue(VPNWatcher.ConfigHandler.SETTING.APPLICATIONS);
-        }
-
-        //this also should be replaced by a C# data binding
-        private void onActionChange(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
-        {
-            m_configHandler.ActionIndex = comboBoxAction.SelectedIndex;
-            Helper.doLog("saving combo box selection " + comboBoxAction.SelectedIndex);
-            m_configHandler.saveValue(VPNWatcher.ConfigHandler.SETTING.CHOSEN_ACTION);
         }
 
         private void checkBoxStartup_Checked(object sender, RoutedEventArgs e)
@@ -377,69 +295,20 @@ namespace VPNWatcher
 
         private void utorrentEnabled_Checked(object sender, RoutedEventArgs e)
         {
-            m_configHandler.uTorrentControlEnabled = true;
-            Helper.doLog("saving uTorrent Enabled " + comboBoxAction.SelectedIndex);
-            m_configHandler.saveValue(ConfigHandler.SETTING.UTORRENT_ENABLED);
-            UtorrentHandler.SetupUtorrentConnection(m_configHandler);
+            if (!m_bIsInitCompleted)
+            {
+                return;
+            }
+            UtorrentHandler.SetupUtorrentConnection();
         }
 
         private void utorrentEnabled_Unchecked(object sender, RoutedEventArgs e)
         {
-            m_configHandler.uTorrentControlEnabled = false;
-            Helper.doLog("saving uTorrent Disabled " + comboBoxAction.SelectedIndex);
-            m_configHandler.saveValue(ConfigHandler.SETTING.UTORRENT_ENABLED);
+            if (!m_bIsInitCompleted)
+            {
+                return;
+            }
             imageUtorrentStatus.Source = null;
-        }
-
-        private void textBoxUtorrentUrl_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
-        {
-            if (!m_bIsInitCompleted)
-            {
-                return;
-            }
-            m_configHandler.uTorrentUrl = textBoxUtorrentUrl.Text;
-            m_configHandler.saveValue(VPNWatcher.ConfigHandler.SETTING.UTORRENT_URL);
-        }
-
-        private void textBoxUtorrentUsername_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
-        {
-            if (!m_bIsInitCompleted)
-            {
-                return;
-            }
-            m_configHandler.uTorrentUsername = textBoxUtorrentUsername.Text;
-            m_configHandler.saveValue(VPNWatcher.ConfigHandler.SETTING.UTORRENT_USR);
-        }
-
-        private void textBoxUtorrentPassword_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
-        {
-            if (!m_bIsInitCompleted)
-            {
-                return;
-            }
-            m_configHandler.uTorrentPassword = textBoxUtorrentPassword.Password;
-            m_configHandler.saveValue(VPNWatcher.ConfigHandler.SETTING.UTORRENT_PWD);
-            //textBoxUtorrentPassword.Password;
-        }
-
-        private void RadioButtonStop_Checked(object sender, RoutedEventArgs e)
-        {
-            if (!m_bIsInitCompleted)
-            {
-                return;
-            }
-            m_configHandler.uTorrentStop = (bool)RadioButtonStop.IsChecked;
-            m_configHandler.saveValue(VPNWatcher.ConfigHandler.SETTING.UTORRENT_STOP);
-        }
-
-        private void RadioButtonStop_Unchecked(object sender, RoutedEventArgs e)
-        {
-            if (!m_bIsInitCompleted)
-            {
-                return;
-            }
-            m_configHandler.uTorrentStop = (bool)RadioButtonStop.IsChecked;
-            m_configHandler.saveValue(VPNWatcher.ConfigHandler.SETTING.UTORRENT_STOP);
         }
 
         private void updateInterval_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -448,12 +317,15 @@ namespace VPNWatcher
             {
                 return;
             }
-            m_configHandler.TimerInMilliseconds = (int)(updateInterval.Value * 1000);
-            m_configHandler.saveValue(VPNWatcher.ConfigHandler.SETTING.TIMER);
-            m_dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, m_configHandler.TimerInMilliseconds);
+            m_dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, Properties.Settings.Default.TimerInMilliSeconds);
         }
 
 
+        // Save Config When Closing
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            Properties.Settings.Default.Save();
+        }
 
 
 
@@ -472,7 +344,7 @@ namespace VPNWatcher
         {
             m_nIcon.Visible = false;
 
-            if (m_configHandler.DebugMode)
+            if (Properties.Settings.Default.DebugMode)
             {
                 System.Windows.Forms.Clipboard.SetText(scrollViewerLog.Content.ToString());
             }
@@ -499,7 +371,7 @@ namespace VPNWatcher
         // minimize the app to the trayicon
         private void doMinimize()
         {
-            Helper.doLog("doMinimize", m_configHandler.DebugMode);
+            Helper.doLog("doMinimize", Properties.Settings.Default.DebugMode);
 
             m_nIcon.Visible = true;
             Hide();
@@ -509,7 +381,7 @@ namespace VPNWatcher
         // maximize the app 
         private void doMaximize()
         {
-            Helper.doLog("doMaximize", m_configHandler.DebugMode);
+            Helper.doLog("doMaximize", Properties.Settings.Default.DebugMode);
 
             m_nIcon.Visible = false;
             Show();

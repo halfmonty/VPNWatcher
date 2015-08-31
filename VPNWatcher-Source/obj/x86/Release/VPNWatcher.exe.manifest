@@ -55,14 +55,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="VPNWatcher.exe" size="358400">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="VPNWatcher.exe" size="357376">
       <assemblyIdentity name="VPNWatcher" version="1.2.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>gCN0dScUlgMidteb2XJGjoUGIQE=</dsig:DigestValue>
+        <dsig:DigestValue>SuSk57jAqT08SQuqnoXJLSyYHzw=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -75,13 +75,13 @@
       <dsig:DigestValue>n+G0n5e6FMdIk0rlyZAQ67IqHRM=</dsig:DigestValue>
     </hash>
   </file>
-  <file name="VPNWatcher.exe.config" size="1011">
+  <file name="VPNWatcher.exe.config" size="3303">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-      <dsig:DigestValue>0sPv0PHa52QEmdygbsHtrwBTqtM=</dsig:DigestValue>
+      <dsig:DigestValue>HaLl4Ag/AZGI6d2yf+uxKn+gP9M=</dsig:DigestValue>
     </hash>
   </file>
   <compatibility xmlns="urn:schemas-microsoft-com:compatibility.v1">
