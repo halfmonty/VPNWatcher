@@ -63,3 +63,4 @@ G:\programming\C#\VPNWatcher_111\sourcecode\VPNWatcher\VPNWatcher-Source\obj\x86
 G:\programming\C#\VPNWatcher_111\sourcecode\VPNWatcher\VPNWatcher-Source\obj\x86\Release\VPNWatcher.application
 G:\programming\C#\VPNWatcher_111\sourcecode\VPNWatcher\VPNWatcher-Source\obj\x86\Release\VPNWatcher_MarkupCompile.lref
 G:\programming\C#\VPNWatcher_111\sourcecode\VPNWatcher\VPNWatcher-Source\obj\x86\Release\GeneratedInternalTypeHelper.g.cs
+G:\programming\C#\VPNWatcher_111\sourcecode\VPNWatcher\VPNWatcher-Source\obj\x86\Release\VPNWatcher.csprojResolveAssemblyReference.cache

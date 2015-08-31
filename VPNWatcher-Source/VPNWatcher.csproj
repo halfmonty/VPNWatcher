@@ -81,6 +81,8 @@
     <Reference Include="System.configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Net" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
@@ -115,6 +117,7 @@
     </Compile>
     <Compile Include="Settings.cs" />
     <Compile Include="ShortcutHandler.cs" />
+    <Compile Include="UpdateChecker.cs" />
     <Compile Include="UtorrentHandler.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
