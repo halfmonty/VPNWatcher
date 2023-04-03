@@ -167,6 +167,8 @@ namespace VPNWatcher
                 iconAction(STATUS.VPN_CONNECTED);
                 return true;
             }
+
+            performApplicationAction();
             return false;
         }
 
